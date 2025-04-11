@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>كورساتي - لوحة التحكم</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="stylesheet" href="css/main.css">
+
+    <!-- Preload script for authentication check -->
+    <script>
+        // Hide the page content until authorization is verified
+        document.documentElement.style.display = 'none';
+
+        // Check token immediately
+        (function () {
+            const token = localStorage.getItem('token');
+
+            // Quick fail if no token exists
+            if (!token) {
+                window.location.replace('login.html?from=dashboard');
+                return;
+            }
+
+            // Check if user is authorized
+            fetch('/api/dashboard', {
+                method: 'GET',
+                headers: { Authorization: `Bearer ${token}` }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Not authorized');
+                    }
+                    return response.json();
+                })
+                .then(() => {
+                    // User is authorized, show the page
+                    document.documentElement.style.display = '';
+                })
+                .catch(() => {
+                    // Not authorized, redirect
+                    localStorage.removeItem('token');
+                    window.location.replace('login.html?from=dashboard');
+                });
+        })();
+    </script>
+</head>
+
+<body style="margin-top: 90px; display: flex; flex-direction: column; min-height: 100vh;">
+    <!-- شريط تنقل محسّن -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-inner">
+                <!-- الشعار والعلامة التجارية -->
+                <div class="navbar-brand-wrapper">
+                    <a class="navbar-brand" href="index.html">
+                        <div class="logo-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <div class="brand-text">
+                            <span class="brand-title">NUMBER 1</span>
+                            <span class="brand-slogan">منصة التعليم الرائدة</span>
+                        </div>
+                    </a>
+                </div>
+                <div class="d-flex align-items-center">
+                    <div class="dropdown notification-dropdown">
+                        <button class="notification-btn" id="notificationsButton" data-bs-toggle="dropdown"
+                            data-bs-auto-close="true" aria-expanded="false">
+                            <i class="fa fa-bell"></i>
+                            <span id="notificationCountBadge" class="notification-badge"></span>
+                        </button>
+                        <ul class="dropdown-menu notification-menu" aria-labelledby="notificationsButton"
+                            id="notificationsDropdown">
+                            <!-- سيتم تعبئتها ديناميًا -->
+                        </ul>
+                    </div>
+
+                    <!-- زر القائمة المنسدلة للشاشات الصغيرة فقط -->
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                        <i class="fas fa-bars"></i>
+                    </button>
+
+                    <div class="navbar-collapse" id="navbarNav">
+                        <!-- روابط التنقل - الآن على نفس السطر في سطح المكتب -->
+                        <ul class="navbar-nav">
+                            <li class="nav-item">
+                                <a class="nav-link" href="index.html">
+                                    <i class="fas fa-home me-1"></i>
+                                    <span>الرئيسية</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="courses.html">
+                                    <i class="fas fa-book me-1"></i>
+                                    <span>الكورسات</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link active" href="dashboard.html">
+                                    <i class="fas fa-tachometer-alt"></i>
+                                    <span>لوحة التحكم</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a id="profileLink" class="nav-link" href="#">
+                                    <i class="fas fa-user-circle me-1"></i>
+                                    <span>الملف الشخصي</span>
+                                </a>
+                            </li>
+                        </ul>
+
+                        <!-- أزرار تسجيل الدخول والتسجيل -->
+                        <div class="auth-actions" id="authBtns">
+                            <a href="login.html" class="auth-btn login-btn">
+                                <i class="fas fa-sign-in-alt"></i>
+                                <span>تسجيل الدخول</span>
+                            </a>
+                            <a href="register.html" class="auth-btn register-btn">
+                                <i class="fas fa-user-plus"></i>
+                                <span>إنشاء حساب</span>
+                            </a>
+                        </div>
+
+                        <!-- أزرار للمستخدمين المسجلين -->
+                        <div class="auth-actions d-none" id="userBtns">
+                            <button type="button" id="logoutBtn" class="auth-btn logout-btn">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>تسجيل خروج</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </nav>
+
+    <!-- Added wrapper to push footer to bottom -->
+    <div id="main-content" style="flex: 1;">
+        <!-- محتوى الصفحة -->
+        <div class="container mt-4" style="max-width: 1400px;">
+
+
+            <!-- شبكة عرض الكورسات -->
+            <div class="row" id="coursesGrid">
+                <!-- سيتم تعبئة الكورسات ديناميًا بواسطة JavaScript -->
+            </div>
+
+            <!-- رسالة عدم وجود كورسات -->
+            <div class="row" id="noCoursesMessage" style="display: none;">
+                <div class="col-md-12 text-center">
+                    <p>لا تتوفر كورسات حاليا.</p>
+                </div>
+            </div>
+
+        </div>
+        <!-- Modal تفاصيل الإشعار مع التعديلات الإضافية -->
+        <div class="modal fade enhanced-modal" id="notificationDetailsModal" tabindex="-1"
+            aria-labelledby="notificationDetailsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="notificationDetailsModalLabel">
+                            <i class="fas fa-bell"></i>
+                            <span id="notificationTitle">عنوان الإشعار</span>
+                        </h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p id="notificationDetailsContent"
+                            style="font-size: 1.1rem; line-height: 1.6; white-space: pre-wrap;"></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    </div>
+
+    <!-- نافذة الملف الشخصي مع التعديلات المحسنة -->
+    <div class="modal fade enhanced-modal" id="profileModal" tabindex="-1" aria-labelledby="profileModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="profileModalLabel">
+                        <i class="fas fa-user-circle"></i>
+                        <span>الملف الشخصي</span></span>
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                        aria-label="إغلاق"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="profileForm">
+                        <div class="mb-4">
+                            <label for="username" class="form-label">اسم المستخدم</label>
+                            <div class="input-icon-wrapper">
+                                <input type="text" class="form-control icon-input" id="username" required>
+                                <i class="fas fa-user input-icon"></i>
+                            </div>
+                        </div>
+                        <!-- Replace the email input field with a read-only version -->
+                        <div class="mb-4">
+                            <label for="email" class="form-label">البريد الإلكتروني</label>
+                            <div class="input-icon-wrapper">
+                                <input type="email" class="form-control icon-input" id="email" readonly disabled>
+                                <i class="fas fa-envelope input-icon"></i>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="password" class="form-label">كلمة المرور</label>
+                            <div class="input-icon-wrapper">
+                                <input type="text" class="form-control icon-input" id="password">
+                                <i class="fas fa-key input-icon"></i>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="grade" class="form-label">الصف الدراسي</label>
+                            <div class="input-icon-wrapper">
+                                <select class="form-control icon-input" id="grade" readonly disabled>
+                                    <!-- سيتم تعبئة الخيارات ديناميًا -->
+                                </select>
+                                <i class="fas fa-graduation-cap input-icon"></i>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                    <button type="submit" form="profileForm" class="btn btn-primary">
+                        <i class="fas fa-save"></i> حفظ التغييرات
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- تذييل الصفحة -->
+    <footer class="footer">
+
+        <div class="footer-content">
+            <div class="container">
+                <div class="row g-4">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="footer-brand">
+                            <div class="footer-logo">
+                                <div class="logo-icon">
+                                    <i class="fas fa-graduation-cap"></i>
+                                </div>
+                                <div class="brand-text">
+                                    <span class="brand-title">NUMBER 1</span>
+                                    <span class="brand-slogan">منصة التعليم الرائدة</span>
+                                </div>
+                            </div>
+                            <p class="footer-description">منصة تعليمية متكاملة تهدف إلى تقديم أفضل المحتويات التعليمية
+                                بطرق مبتكرة وفعالة</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <div class="footer-links">
+                            <h4 class="footer-title">روابط سريعة</h4>
+                            <ul class="footer-menu">
+                                <li><a href="index.html"><i class="fas fa-chevron-left"></i> الرئيسية</a></li>
+                                <li><a href="courses.html"><i class="fas fa-chevron-left"></i> الكورسات</a></li>
+                                <li><a href="register.html"><i class="fas fa-chevron-left"></i>انشاء حساب</a></li>
+                                <li><a href="login.html"><i class="fas fa-chevron-left"></i> تسجيل الدخول</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <div class="footer-contact">
+                            <h4 class="footer-title">تواصل معنا</h4>
+                            <div class="social-links">
+                                <a href="https://www.facebook.com/share/19xa9j7611/" class="social-link facebook">
+                                    <i class="fab fa-facebook-f"></i>
+                                </a>
+                                <a href="#" class="social-link twitter">
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                                <a href="#" class="social-link instagram">
+                                    <i class="fab fa-instagram"></i>
+                                </a>
+                                <a href="https://wa.me/201552190276" class="social-link whatsapp">
+                                    <i class="fab fa-whatsapp"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container">
+                <div class="footer-copyright">
+                    <p class="mb-0">&copy; NUMBER 1 - جميع الحقوق محفوظة 2025</p>
+                    <div class="footer-credits">
+                        <p>
+                            <span>تم التطوير بواسطة</span>
+                            <a href="https://wa.me/201552190276">Khaled Osman</a> |
+                            <a href="https://www.facebook.com/share/19xa9j7611/">Education Plus</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+
+    <!-- Bootstrap JS وجافاسكريبت -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/dashboard.js"></script>
+    <script src="js/main.js"></script>
+    </div>
+
+
+
+</body>
+
+</html>

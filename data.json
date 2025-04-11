@@ -1,0 +1,293 @@
+{
+  "users": [
+    {
+      "id": 1738562296250,
+      "username": "Admin",
+      "email": "admin@gmail.com",
+      "password": "KhaledOsman@5355",
+      "isAdmin": true,
+      "grade": "الصف الاول الاعدادي",
+      "isBanned": false
+    },
+    {
+      "id": 1738667145002,
+      "username": "الطالب: خالد محمد حسن عثمان",
+      "email": "khaled@gmail.com",
+      "password": "123",
+      "grade": "الصف الاول الاعدادي",
+      "isAdmin": false,
+      "isBanned": false
+    },
+    {
+      "id": 1739032996966,
+      "username": "user",
+      "email": "user2@gmail.com",
+      "password": "123",
+      "grade": "الصف الثاني الاعدادي",
+      "isAdmin": false,
+      "isBanned": true
+    },
+    {
+      "id": 1739034240230,
+      "username": "admin",
+      "email": "admin1@gmail.com",
+      "password": "1",
+      "grade": "الصف الاول الاعدادي",
+      "isAdmin": false,
+      "isBanned": false
+    },
+    {
+      "id": 1739051689779,
+      "username": "admin",
+      "email": "admin1@gmail.com",
+      "password": "1",
+      "grade": "الصف الاول الاعدادي",
+      "isAdmin": false,
+      "isBanned": false
+    },
+    {
+      "id": 1739052148050,
+      "username": "khaled@gmail.com",
+      "email": "khaled1@gmail.com",
+      "password": "123",
+      "grade": "الصف الاول الاعدادي",
+      "isAdmin": false,
+      "isBanned": false
+    },
+    {
+      "id": 1739642099899,
+      "username": "admin@gmail.com",
+      "email": "moha000med@gmail.com",
+      "password": "1",
+      "grade": "الصف الاول الاعدادي",
+      "isAdmin": false,
+      "isBanned": false
+    },
+    {
+      "id": 1740769127390,
+      "username": "تتتت",
+      "email": "kf@gmail.com",
+      "password": "ااا",
+      "grade": "الصف الثاني الاعدادي",
+      "isAdmin": false,
+      "isBanned": false
+    },
+    {
+      "id": 1743176400014,
+      "username": "Khaled Osman",
+      "email": "khaled5355@gmail.com",
+      "password": "$2b$10$V92M/ti8Jd0/Z6bJfrGYLun06zF63WXjFMWa5TrMAb4.Xi42INCje",
+      "grade": "الصف الاول الاعدادي",
+      "isAdmin": false,
+      "isBanned": true
+    },
+    {
+      "id": 1743177489484,
+      "username": "AliMohamed",
+      "email": "alimohamed@gmail.com",
+      "password": "$2b$10$rkicGAeuZgSJcIGDxbUgVeGy/q0jcyN2e0In8ErC4hUfnNe5yRqIm",
+      "grade": "الصف الاول الاعدادي",
+      "isAdmin": false,
+      "isBanned": false
+    },
+    {
+      "id": 1743451940939,
+      "username": "khaled sama",
+      "email": "khaledsama@gmail.com",
+      "password": "1234",
+      "grade": "الصف الاول الاعدادي",
+      "isAdmin": false,
+      "isBanned": false
+    },
+    {
+      "id": 1743452127230,
+      "username": "jjjj",
+      "email": "kh00aled@gmail.com",
+      "password": "0000",
+      "grade": "الصف الاول الاعدادي",
+      "isAdmin": false,
+      "isBanned": false
+    },
+    {
+      "id": 1743452190965,
+      "username": "0000",
+      "email": "test1000@gmail.com",
+      "password": "00000",
+      "grade": "الصف الاول الاعدادي",
+      "isAdmin": false,
+      "isBanned": false
+    },
+    {
+      "id": 1743452634714,
+      "username": "hsh",
+      "email": "moham0000ed@l.com",
+      "password": "0000",
+      "grade": "الصف الاول الاعدادي",
+      "isAdmin": false,
+      "isBanned": false
+    },
+    {
+      "id": 1743452824323,
+      "username": "ههلا",
+      "email": "mohamed@l.com00",
+      "password": "0000",
+      "grade": "الصف الاول الاعدادي",
+      "isAdmin": false,
+      "isBanned": false
+    },
+    {
+      "id": 1743452969510,
+      "username": "تستت",
+      "email": "khaled@gmail.com000",
+      "password": "0000",
+      "grade": "الصف الاول الاعدادي",
+      "isAdmin": false,
+      "isBanned": false
+    },
+    {
+      "id": 1743453110524,
+      "username": "تتت",
+      "email": "9999@xn--pgb",
+      "password": "888",
+      "grade": "الصف الاول الاعدادي",
+      "isAdmin": false,
+      "isBanned": false
+    },
+    {
+      "id": 1743488221326,
+      "username": "admin@gmail.com",
+      "email": "88888@gmail",
+      "password": "KhaledOsman@5355",
+      "grade": "الصف الاول الاعدادي",
+      "isAdmin": false,
+      "isBanned": false
+    },
+    {
+      "id": 1743490011210,
+      "username": "محمد عويضة",
+      "email": "mohamedewida@gmail.com",
+      "password": "1234",
+      "grade": "الصف الاول الاعدادي",
+      "isAdmin": false,
+      "isBanned": false
+    }
+  ],
+  "courses": [
+    {
+      "id": 1743320238580,
+      "title": "الباب الثاني : الكيمياء التحليلية الصف الثالث الثانوي",
+      "videoURL": "https://www.youtube.com/embed/7zR_ynfzXQQ?si=GbTb0u5cze0SRvtZ?rel=0amp;showinfo=0amp;controls=0",
+      "videos": [
+        {
+          "id": "",
+          "title": "مقدمة عن الكيمياء التحليلية والكربونات والبيكربونات الصف الثالث الثانوي",
+          "url": "https://www.youtube.com/embed/7zR_ynfzXQQ?si=GbTb0u5cze0SRvtZ?rel=0amp;showinfo=0amp;controls=0",
+          "addedDate": "2025-03-30T08:23:34.772Z"
+        },
+        {
+          "id": "",
+          "title": "أنيونات حمض الهيدروكلوريك المخفف",
+          "url": "https://www.youtube.com/embed/GS7DGoTp5L0?si=y17cDnXNVLFBaVRM",
+          "addedDate": "2025-03-30T08:31:45.714Z"
+        },
+        {
+          "id": "",
+          "title": "مجموعة أنيونات حمض الكبريتيك المركز ومجموعة محلول كلوريد الباريوم",
+          "url": "https://www.youtube.com/embed/20O4sfQzQN4?si=CjKqc5ReI6CCiZSd",
+          "addedDate": "2025-03-30T08:31:45.715Z"
+        },
+        {
+          "id": "",
+          "title": "الكشف عن الشقوق القاعديه",
+          "url": "https://www.youtube.com/embed/jouVsb6LNYk?si=p3Lp9Du4xH4Xb1Z8",
+          "addedDate": "2025-03-30T08:31:45.715Z"
+        },
+        {
+          "id": "",
+          "title": "شرح التحليل الكمي",
+          "url": "https://www.youtube.com/embed/Pqtgf33XDXk?si=yUYzXBoHGQOEpaWy",
+          "addedDate": "2025-03-30T08:31:45.715Z"
+        },
+        {
+          "id": "",
+          "title": "مراجعة اسطوري علي التحليل الكيميائي",
+          "url": "https://www.youtube.com/embed/tWJOVn0alSk?si=1Mvcqs4z1fEHFR-8",
+          "addedDate": "2025-03-30T08:31:45.715Z"
+        },
+        {
+          "id": "",
+          "title": "شرح التحليل الكمي",
+          "url": "https://www.youtube.com/embed/tWJOVn0alSk?si=1Mvcqs4z1fEHFR-8",
+          "addedDate": "2025-03-31T09:19:42.398Z"
+        }
+      ],
+      "activities": [
+        {
+          "id": "",
+          "title": "امتحان",
+          "filePath": "/uploads/1743534811271.pdf",
+          "addedDate": "2025-04-01T19:13:31.314Z"
+        }
+      ],
+      "exams": [
+        {
+          "id": "",
+          "title": "امتحان",
+          "googleFormUrl": "https://www.youtube.com/embed/tWJOVn0alSk?si=1Mvcqs4z1fEHFR-8",
+          "courseId": "1743320238580",
+          "grade": "الصف الاول الاعدادي",
+          "addedDate": "2025-03-31T09:20:27.008Z"
+        }
+      ],
+      "grade": "الصف الاول الاعدادي",
+      "imageURL": "/uploads/1743517844168.webp",
+      "addedDate": "2023-10-30T12:23:58.580Z",
+      "price": 220
+    },
+    {
+      "id": 1743346705551,
+      "title": "الباب الثاني : الكيمياء التحليلية الصف الثالث الثانوي1",
+      "videoURL": "https://www.youtube.com/embed/7zR_ynfzXQQ?si=GbTb0u5cze0SRvtZ",
+      "videos": [],
+      "activities": [],
+      "exams": [],
+      "grade": "الصف الاول الاعدادي",
+      "imageURL": "/uploads/1743517864506.webp",
+      "addedDate": "2023-10-30T12:23:58.580Z",
+      "price": 0
+    }
+  ],
+  "grades": [
+    {
+      "id": 1738789210737,
+      "name": "الصف الاول الاعدادي"
+    },
+    {
+      "id": 1738789224871,
+      "name": "الصف الثاني الاعدادي"
+    },
+    {
+      "id": 1738789236778,
+      "name": "الصف الثالث الاعدادي"
+    },
+    {
+      "id": 1743489265719,
+      "name": "الصف الاول الثانوي"
+    }
+  ],
+  "notifications": [
+    {
+      "id": 1743316256768,
+      "title": "تعليمات منصة NUMBER 1",
+      "content": "لضمان تشغيل المنصة بدون أي عطل أو بطء في تحميل الفيديوهات، يرجى الالتزام بالتعليم",
+      "grade": "عام"
+    },
+    {
+      "id": 1743452657130,
+      "title": "jjjj",
+      "content": "jjj",
+      "grade": "عام"
+    }
+  ],
+  "activationCodes": []
+}

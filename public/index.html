@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>NUMBER 1</title>
+    <!-- ربط Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- ربط خطوط Google -->
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <!-- ربط Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- ربط مكتبة AOS (Animate On Scroll) -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <!-- ربط ملف CSS الرئيسي -->
+    <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body style="margin-top: 80px;">
+    <!-- شريط التنقل -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-inner">
+                <!-- الشعار والعلامة التجارية -->
+                <div class="navbar-brand-wrapper">
+                    <a class="navbar-brand" href="index.html">
+                        <div class="logo-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <div class="brand-text">
+                            <span class="brand-title">NUMBER 1</span>
+                            <span class="brand-slogan">منصة التعليم الرائدة</span>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- زر القائمة المنسدلة للشاشات الصغيرة فقط -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <i class="fas fa-bars"></i>
+                </button>
+
+                <div class="navbar-collapse" id="navbarNav">
+                    <!-- روابط التنقل - الآن على نفس السطر في سطح المكتب -->
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="index.html">
+                                <i class="fas fa-home me-1"></i>
+                                <span>الرئيسية</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="courses.html">
+                                <i class="fas fa-book me-1"></i>
+                                <span>الكورسات</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fas fa-info-circle me-1"></i>
+                                <span>عن المنصة</span>
+                            </a>
+                        </li>
+                    </ul>
+
+                    <!-- أزرار تسجيل الدخول والتسجيل -->
+                    <div class="auth-actions" id="authBtns">
+                        <a href="login.html" class="auth-btn login-btn">
+                            <i class="fas fa-sign-in-alt"></i>
+                            <span>تسجيل الدخول</span>
+                        </a>
+                        <a href="register.html" class="auth-btn register-btn">
+                            <i class="fas fa-user-plus"></i>
+                            <span>إنشاء حساب</span>
+                        </a>
+                    </div>
+
+                    <!-- أزرار للمستخدمين المسجلين -->
+                    <div class="auth-actions d-none" id="userBtns">
+                        <a href="dashboard.html" class="auth-btn dashboard-btn">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>لوحة التحكم</span>
+                        </a>
+                        <button type="button" id="logoutBtn" class="auth-btn logout-btn">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>تسجيل خروج</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- قسم صاحب المنصة -->
+    <section class="owner-section py-5">
+        <div class="container">
+            <div class="owner-profile-card">
+                <div class="owner-image-container" data-aos="fade-right" data-aos-duration="1000">
+                    <img src="https://i.ibb.co/MYhkh75/photo.jpg" alt="صاحب المنصة" class="owner-image">
+                    <div class="owner-image-decoration"></div>
+                </div>
+                <div class="owner-details" data-aos="fade-left" data-aos-duration="1000">
+                    <h1 class="owner-name">منصة N U M B E R 1</h1>
+                    <h3 class="owner-title">"لمستر محمد عويضة"</h3>
+                    <p class="owner-bio">
+                        نقدم محتوى تعليمي فريد ومتميز في مادة الدراسات الاجتماعية، باستخدام أحدث الأساليب التعليمية
+                        لتطوير مهاراتك وتحقيق النجاح.
+                    </p>
+                    <div class="social-links">
+                        <a href="#" class="social-link facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-link twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-link instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-link linkedin"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- قسم الإنجازات -->
+    <section class="achievements-section" data-aos="fade-up" data-aos-duration="1000">
+        <div class="container">
+            <h2 class="section-heading mb-5">إنجازاتنا</h2>
+            <div class="achievements-container">
+                <div class="achievement-card">
+                    <div class="achievement-icon">
+                        <i class="fas fa-award"></i>
+                    </div>
+                    <div class="achievement-number">15+</div>
+                    <div class="achievement-text">سنوات خبرة</div>
+                </div>
+                <div class="achievement-card">
+                    <div class="achievement-icon">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <div class="achievement-number">5000+</div>
+                    <div class="achievement-text">طالب ناجح</div>
+                </div>
+                <div class="achievement-card">
+                    <div class="achievement-icon">
+                        <i class="fas fa-thumbs-up"></i>
+                    </div>
+                    <div class="achievement-number">98%</div>
+                    <div class="achievement-text">رضا العملاء</div>
+                </div>
+                <div class="achievement-card">
+                    <div class="achievement-icon">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <div class="achievement-number">50+</div>
+                    <div class="achievement-text">كورس تدريبي</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- قسم "عن المنصة" - تصميم محسّن بلون موحد -->
+    <section id="aboutUs" data-aos="fade-up" data-aos-duration="1000">
+        <div class="container">
+            <h2 class="section-heading mb-5">عن المنصة</h2>
+            <div class="about-card">
+                <div class="about-card-decoration"></div>
+                <div class="about-card-content">
+                    <div class="about-logo">
+                        <i class="fas fa-graduation-cap"></i>
+                        <h1 class="about-title">N U M B E R 1</h1>
+                    </div>
+                    <p class="about-description">منصة تعليمية تقدم محتوى تعليمي مميز ومتنوع في مادة الدراسات الاجتماعية،
+                        تم تصميم المنصة
+                        لتوفير تجربة تعليمية فريدة وممتعة للطلاب.</p>
+                    <a href="#coursesSection" class="about-cta-button">اكتشف الكورسات</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- قسم "المميزات" -->
+    <section id="services" class="py-6 mb-5 fade-in" data-aos="fade-up" data-aos-duration="1000">
+        <div class="container">
+            <h2 class="section-heading mb-5">مميزات منصتنا</h2>
+            <div class="row g-4">
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <i class="fas fa-video"></i>
+                            <h5 class="card-title">فيديوهات تفاعلية</h5>
+                            <p class="card-text">تعلم بسهولة من خلال فيديوهات مميزة ومحتوى تفاعلي يساعدك على فهم المادة
+                                بشكل أفضل.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <i class="fas fa-book"></i>
+                            <h5 class="card-title">محتوى تعليمي</h5>
+                            <p class="card-text">محتوى تعليمي متنوع ومميز يغطي مجموعة واسعة من المواضيع بطريقة منظمة
+                                وشاملة.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <i class="fas fa-lightbulb"></i>
+                            <h5 class="card-title">شرح مبسط</h5>
+                            <p class="card-text">شروحات مبسطة وسهلة الفهم تساعدك على تحقيق أقصى استفادة وتطوير مهاراتك
+                                بسرعة.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- قسم "أحدث الكورسات" -->
+    <section id="coursesSection" data-aos="fade-up" data-aos-duration="1000">
+        <div class="container">
+            <h2 class="section-heading mb-5">أحدث الكورسات</h2>
+            <div class="row g-4" id="latestCoursesGrid">
+                <!-- سيتم تعبئة الكورسات ديناميًا بواسطة JavaScript -->
+            </div>
+            <div class="text-center mt-4">
+                <a href="courses.html" class="about-cta-button">عرض جميع الكورسات</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- تذييل الصفحة -->
+    <footer class="footer">
+
+        <div class="footer-content">
+            <div class="container">
+                <div class="row g-4">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="footer-brand">
+                            <div class="footer-logo">
+                                <div class="logo-icon">
+                                    <i class="fas fa-graduation-cap"></i>
+                                </div>
+                                <div class="brand-text">
+                                    <span class="brand-title">NUMBER 1</span>
+                                    <span class="brand-slogan">منصة التعليم الرائدة</span>
+                                </div>
+                            </div>
+                            <p class="footer-description">منصة تعليمية متكاملة تهدف إلى تقديم أفضل المحتويات
+                                التعليمية
+                                بطرق مبتكرة وفعالة</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <div class="footer-links">
+                            <h4 class="footer-title">روابط سريعة</h4>
+                            <ul class="footer-menu">
+                                <li><a href="index.html"><i class="fas fa-chevron-left"></i> الرئيسية</a></li>
+                                <li><a href="courses.html"><i class="fas fa-chevron-left"></i> الكورسات</a></li>
+                                <li><a href="register.html"><i class="fas fa-chevron-left"></i>انشاء حساب</a></li>
+                                <li><a href="login.html"><i class="fas fa-chevron-left"></i> تسجيل الدخول</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <div class="footer-contact">
+                            <h4 class="footer-title">تواصل معنا</h4>
+                            <div class="social-links">
+                                <a href="https://www.facebook.com/share/19xa9j7611/" class="social-link facebook">
+                                    <i class="fab fa-facebook-f"></i>
+                                </a>
+                                <a href="#" class="social-link twitter">
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                                <a href="#" class="social-link instagram">
+                                    <i class="fab fa-instagram"></i>
+                                </a>
+                                <a href="https://wa.me/201552190276" class="social-link whatsapp">
+                                    <i class="fab fa-whatsapp"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container">
+                <div class="footer-copyright">
+                    <p class="mb-0">&copy; NUMBER 1 - جميع الحقوق محفوظة 2025</p>
+                    <div class="footer-credits">
+                        <p>
+                            <span>تم التطوير بواسطة</span>
+                            <a href="https://wa.me/201552190276">Khaled Osman</a> |
+                            <a href="https://www.facebook.com/share/19xa9j7611/">Education Plus</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+
+    <!-- ربط Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- ربط مكتبة AOS JS -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="js/main.js"></script>
+</body>
+
+</html>

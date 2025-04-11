@@ -1,0 +1,183 @@
+/* Additional styles for subscription management page */
+
+/* Filter options styling */
+.filter-options {
+    margin-bottom: 1.5rem;
+}
+
+.filter-options button {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+.filter-options button.active {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Export buttons styling */
+.export-buttons {
+    margin-top: 1.5rem;
+}
+
+.export-buttons button {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+.export-buttons button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Table styling - additional for subscription codes */
+#codesTable th,
+#codesTable td {
+    vertical-align: middle;
+}
+
+#codesTable td:nth-child(2) {
+    font-weight: 600;
+    font-family: monospace;
+    font-size: 1.1rem;
+}
+
+/* Status badge custom styling */
+#codesTable .badge {
+    padding: 0.5rem 0.75rem;
+    font-weight: 600;
+    border-radius: 50px;
+}
+
+/* Action buttons in table */
+#codesTable .btn {
+    margin: 0 2px;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+#codesTable .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+#codesTable .btn i {
+    font-size: 1rem;
+}
+
+/* Code details modal */
+.code-details h5 {
+    font-family: monospace;
+    text-align: center;
+    padding: 1rem;
+    background-color: #f8fafc;
+    border-radius: 0.5rem;
+    box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.05);
+    font-size: 1.5rem;
+    letter-spacing: 1px;
+}
+
+.code-details table th {
+    width: 40%;
+    background-color: #f8fafc;
+}
+
+/* Create codes form styling */
+#createCodesForm .form-control,
+#createCodesForm .form-select {
+    border-radius: 0.5rem;
+    padding: 0.6rem 0.8rem;
+    border: 1px solid #d1d5db;
+    transition: all 0.2s ease;
+}
+
+#createCodesForm .form-control:focus,
+#createCodesForm .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+#createCodesForm .form-text {
+    color: #6b7280;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+/* Responsive styles */
+@media (max-width: 992px) {
+    .filter-options button {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+    }
+
+    .export-buttons button {
+        padding: 0.4rem 0.8rem;
+        font-size: 0.9rem;
+        flex: 1;
+        text-align: center;
+    }
+}
+
+@media (max-width: 768px) {
+
+    #codesTable th:nth-child(4),
+    #codesTable td:nth-child(4),
+    #codesTable th:nth-child(8),
+    #codesTable td:nth-child(8) {
+        display: none;
+    }
+
+    #codesTable td:nth-child(2) {
+        font-size: 0.9rem;
+    }
+
+    #codesTable .btn {
+        width: 32px;
+        height: 32px;
+    }
+
+    #codesTable .btn i {
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 576px) {
+
+    #codesTable th:nth-child(5),
+    #codesTable td:nth-child(5) {
+        display: none;
+    }
+
+    .filter-options {
+        justify-content: space-between;
+    }
+
+    .filter-options button {
+        flex: 1;
+        padding: 0.3rem 0.5rem;
+        font-size: 0.8rem;
+    }
+
+    .export-buttons {
+        flex-direction: column;
+    }
+
+    .export-buttons button {
+        margin-bottom: 0.5rem;
+    }
+
+    .code-details h5 {
+        font-size: 1.2rem;
+        padding: 0.75rem;
+    }
+}

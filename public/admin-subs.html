@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>إدارة الاشتراكات - لوحة الأدمن</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- ربط ملف CSS الخاص بلوحة المسؤول -->
+    <link rel="stylesheet" href="css/admin.css">
+    <link rel="stylesheet" href="css/admin-subs.css">
+
+    <!-- Preload script for authentication check -->
+    <script>
+        // Hide the page content until authorization is verified
+        document.documentElement.style.display = 'none';
+
+        // Check token immediately
+        (function () {
+            const token = localStorage.getItem('token');
+
+            // Quick fail if no token exists
+            if (!token) {
+                window.location.replace('login.html?from=admin');
+                return;
+            }
+
+            // Check if user has admin rights
+            fetch('/api/admin/dashboard', {
+                method: 'GET',
+                headers: { Authorization: `Bearer ${token}` }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Not authorized');
+                    }
+                    return response.json();
+                })
+                .then(() => {
+                    // User is admin, show the page
+                    document.documentElement.style.display = '';
+                })
+                .catch(() => {
+                    // Not authorized, redirect
+                    localStorage.removeItem('token');
+                    window.location.replace('login.html?from=admin');
+                });
+        })();
+    </script>
+</head>
+
+<body>
+
+    <!-- Page Content -->
+    <div id="page-content-wrapper">
+        <!-- شريط التنقل العلوي -->
+
+        <nav class="navbar navbar-expand-lg navbar-light">
+            <div class="container-fluid">
+                <div class="d-flex align-items-center navbar-content">
+                    <div class="profile-icon me-2">
+                        <i class="fas fa-user-circle"></i>
+                    </div>
+                    <div class="admin-welcome me-3">
+                        <span>مرحبا، أدمن</span>
+                    </div>
+                    <a class="nav-link" href="index.html">
+                        <i class="fas fa-home me-1"></i> الرئيسية
+                    </a>
+                    <a class="nav-link" href="dashboard.html">
+                        <i class="fas fa-tachometer-alt me-1"></i> لوحة التحكم
+                    </a>
+                    <button class="btn btn-outline-danger logout-btn" type="button" id="headerLogoutLink">
+                        <i class="fas fa-sign-out-alt me-1"></i> تسجيل الخروج
+                    </button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- قسم الإحصائيات -->
+        <section id="subscriptionStatsSection" class="mt-3 mb-4">
+            <div class="row">
+                <div class="col-md-4 col-sm-6 mb-3">
+                    <div class="stat-card">
+                        <i class="fas fa-key fa-2x mb-2"></i>
+                        <div>أكواد نشطة</div>
+                        <span id="totalActiveCodes" class="fs-4 fw-bold">0</span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 mb-3">
+                    <div class="stat-card">
+                        <i class="fas fa-check-circle fa-2x mb-2"></i>
+                        <div>أكواد مستخدمة</div>
+                        <span id="totalUsedCodes" class="fs-4 fw-bold">0</span>
+                    </div>
+                </div>
+                <div class="col-md-4 col-sm-6 mb-3">
+                    <div class="stat-card">
+                        <i class="fas fa-users fa-2x mb-2"></i>
+                        <div>إجمالي الاشتراكات</div>
+                        <span id="totalSubscriptions" class="fs-4 fw-bold">0</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- نظام التبويبات -->
+        <div class="admin-tabs">
+            <ul class="nav nav-tabs" id="subscriptionTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="codes-tab" data-bs-toggle="tab" data-bs-target="#codesTab"
+                        type="button" role="tab" aria-controls="codesTab" aria-selected="true">
+                        <i class="fas fa-key me-2"></i> إدارة الأكواد
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="subscriptions-tab" data-bs-toggle="tab"
+                        data-bs-target="#subscriptionsTab" type="button" role="tab" aria-controls="subscriptionsTab"
+                        aria-selected="false">
+                        <i class="fas fa-id-card me-2"></i> الاشتراكات
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="plans-tab" data-bs-toggle="tab" data-bs-target="#plansTab"
+                        type="button" role="tab" aria-controls="plansTab" aria-selected="false">
+                        <i class="fas fa-list-alt me-2"></i> أنواع الاشتراكات
+                    </button>
+                </li>
+            </ul>
+
+            <!-- محتوى التبويبات -->
+            <div class="tab-content" id="subscriptionTabsContent">
+                <!-- تبويب إدارة الأكواد -->
+                <div class="tab-pane fade show active" id="codesTab" role="tabpanel" aria-labelledby="codes-tab">
+                    <!-- رأس القسم مع زر إضافة أكواد -->
+                    <div class="section-header">
+                        <h3 class="section-title">
+                            <i class="fas fa-key"></i> إدارة أكواد التفعيل
+                        </h3>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createCodesModal">
+                            <i class="fas fa-plus-circle me-1"></i> إنشاء أكواد
+                        </button>
+                    </div>
+
+                    <!-- حقل البحث -->
+                    <div class="search-container">
+                        <div class="input-group">
+                            <input type="search" id="codeSearchInput" class="form-control"
+                                placeholder="البحث في الأكواد...">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        </div>
+                    </div>
+
+                    <!-- تصفية الأكواد -->
+                    <div class="filter-options mb-3 d-flex flex-wrap gap-2">
+                        <button class="btn btn-sm btn-outline-primary active" data-filter="all">جميع الأكواد</button>
+                        <button class="btn btn-sm btn-outline-success" data-filter="active">الأكواد النشطة</button>
+                        <button class="btn btn-sm btn-outline-secondary" data-filter="used">الأكواد المستخدمة</button>
+                    </div>
+
+                    <!-- جدول أكواد التفعيل -->
+                    <div class="table-responsive">
+                        <table class="table data-table" id="codesTable">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>كود التفعيل</th>
+                                    <th>نوع الاشتراك</th>
+                                    <th>تاريخ الإنشاء</th>
+                                    <th>تاريخ الانتهاء</th>
+                                    <th>الحالة</th>
+                                    <th>المستخدم</th>
+                                    <th>تاريخ الاستخدام</th>
+                                    <th>الإجراءات</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- سيتم ملء البيانات باستخدام JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- التنقل بين الصفحات -->
+                    <div id="codesPagination" class="pagination-container">
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination">
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" aria-label="Previous">
+                                        <span aria-hidden="true">&laquo;</span>
+                                    </a>
+                                </li>
+                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                                <li class="page-item disabled">
+                                    <a class="page-link" href="#" aria-label="Next">
+                                        <span aria-hidden="true">&raquo;</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+
+                    <!-- أزرار تصدير البيانات -->
+                    <div class="export-buttons mt-3 d-flex flex-wrap gap-2">
+                        <button id="exportAllCodes" class="btn btn-outline-primary">
+                            <i class="fas fa-file-export me-1"></i> تصدير جميع الأكواد
+                        </button>
+                        <button id="exportActiveCodes" class="btn btn-outline-success">
+                            <i class="fas fa-file-export me-1"></i> تصدير الأكواد النشطة
+                        </button>
+                        <button id="exportUsedCodes" class="btn btn-outline-secondary">
+                            <i class="fas fa-file-export me-1"></i> تصدير الأكواد المستخدمة
+                        </button>
+                    </div>
+                </div>
+
+                <!-- تبويب الاشتراكات -->
+                <div class="tab-pane fade" id="subscriptionsTab" role="tabpanel" aria-labelledby="subscriptions-tab">
+                    <div class="section-header">
+                        <h3 class="section-title">
+                            <i class="fas fa-id-card"></i> إدارة اشتراكات الطلاب
+                        </h3>
+                    </div>
+                    <!-- محتوى تبويب الاشتراكات سيضاف لاحقاً -->
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i> قسم إدارة اشتراكات الطلاب تحت التطوير.
+                    </div>
+                </div>
+
+                <!-- تبويب أنواع الاشتراكات -->
+                <div class="tab-pane fade" id="plansTab" role="tabpanel" aria-labelledby="plans-tab">
+                    <div class="section-header">
+                        <h3 class="section-title">
+                            <i class="fas fa-list-alt"></i> إدارة أنواع الاشتراكات
+                        </h3>
+                    </div>
+                    <!-- محتوى تبويب أنواع الاشتراكات سيضاف لاحقاً -->
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i> قسم إدارة أنواع الاشتراكات تحت التطوير.
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- النوافذ المنبثقة -->
+        <!-- نافذة إنشاء أكواد جديدة -->
+        <div class="modal fade" id="createCodesModal" tabindex="-1" aria-labelledby="createCodesModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="createCodesModalLabel">إنشاء أكواد تفعيل جديدة</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="createCodesForm">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="codeCount" class="form-label">عدد الأكواد</label>
+                                    <input type="number" class="form-control" id="codeCount" min="1" max="100"
+                                        value="1">
+                                    <div class="form-text">أقصى عدد يمكن إنشاؤه دفعة واحدة هو 100 كود.</div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="subscriptionType" class="form-label">نوع الاشتراك</label>
+                                    <select class="form-select" id="subscriptionType">
+                                        <option value="basic">اشتراك أساسي (كورس واحد)</option>
+                                        <option value="standard">اشتراك قياسي (3 كورسات)</option>
+                                        <option value="premium">اشتراك متميز (جميع الكورسات)</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="expiryDate" class="form-label">تاريخ انتهاء الصلاحية</label>
+                                    <input type="date" class="form-control" id="expiryDate">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="codePrefix" class="form-label">بادئة الكود (اختياري)</label>
+                                    <input type="text" class="form-control" id="codePrefix" maxlength="5"
+                                        placeholder="مثال: EGY-">
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="notes" class="form-label">ملاحظات (اختياري)</label>
+                                <textarea class="form-control" id="notes" rows="2"></textarea>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إلغاء</button>
+                        <button type="button" class="btn btn-primary" id="generateCodesBtn">إنشاء الأكواد</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- نافذة عرض تفاصيل الكود -->
+        <div class="modal fade" id="codeDetailsModal" tabindex="-1" aria-labelledby="codeDetailsModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="codeDetailsModalLabel">تفاصيل كود التفعيل</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="code-details">
+                            <div class="mb-3">
+                                <h5 class="text-primary" id="viewCodeValue">ABC-123456</h5>
+                            </div>
+                            <table class="table table-bordered">
+                                <tr>
+                                    <th>نوع الاشتراك</th>
+                                    <td id="viewSubscriptionType">-</td>
+                                </tr>
+                                <tr>
+                                    <th>تاريخ الإنشاء</th>
+                                    <td id="viewCreationDate">-</td>
+                                </tr>
+                                <tr>
+                                    <th>تاريخ الانتهاء</th>
+                                    <td id="viewExpiryDate">-</td>
+                                </tr>
+                                <tr>
+                                    <th>الحالة</th>
+                                    <td id="viewStatus">-</td>
+                                </tr>
+                                <tr>
+                                    <th>المستخدم</th>
+                                    <td id="viewUser">-</td>
+                                </tr>
+                                <tr>
+                                    <th>تاريخ الاستخدام</th>
+                                    <td id="viewUsageDate">-</td>
+                                </tr>
+                                <tr>
+                                    <th>ملاحظات</th>
+                                    <td id="viewNotes">-</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">إغلاق</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /#page-content-wrapper -->
+
+    <!-- Bootstrap JS وجافاسكريبت -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/admin-subs.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            document.getElementById('headerLogoutLink').addEventListener('click', function (e) {
+                e.preventDefault();
+                localStorage.removeItem('token');
+                window.location.href = 'login.html';
+            });
+        });
+    </script>
+
+</body>
+
+</html>

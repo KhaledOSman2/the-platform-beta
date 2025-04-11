@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>تفعيل اشتراك الكورس</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/course.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/subscription.css">
+
+    <!-- Preload script for authentication check -->
+    <script>
+        // Hide the page content until authorization is verified
+        document.documentElement.style.display = 'none';
+
+        // Check token immediately
+        (function () {
+            const token = localStorage.getItem('token');
+
+            // Quick fail if no token exists
+            if (!token) {
+                window.location.replace('login.html?from=subscription');
+                return;
+            }
+
+            // Check if user is authorized
+            fetch('/api/dashboard', {
+                method: 'GET',
+                headers: { Authorization: `Bearer ${token}` }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Not authorized');
+                    }
+                    return response.json();
+                })
+                .then(() => {
+                    // User is authorized, show the page
+                    document.documentElement.style.display = '';
+                })
+                .catch((error) => {
+                    console.error('Authorization error:', error);
+                    // For debugging - show page anyway in case API is not available
+                    document.documentElement.style.display = '';
+                    // Not authorized, redirect
+                    // localStorage.removeItem('token');
+                    // window.location.replace('login.html?from=subscription');
+                });
+        })();
+    </script>
+</head>
+
+<body>
+
+    <!-- تأثير التحميل -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-inner">
+                <!-- الشعار والعلامة التجارية -->
+                <div class="navbar-brand-wrapper">
+                    <a class="navbar-brand" href="index.html">
+                        <div class="logo-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <div class="brand-text">
+                            <span class="brand-title">NUMBER 1</span>
+                            <span class="brand-slogan">منصة التعليم الرائدة</span>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- زر القائمة المنسدلة للشاشات الصغيرة فقط -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <i class="fas fa-bars"></i>
+                </button>
+
+                <div class="navbar-collapse" id="navbarNav">
+                    <!-- روابط التنقل - الآن على نفس السطر في سطح المكتب -->
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">
+                                <i class="fas fa-home me-1"></i>
+                                <span>الرئيسية</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="courses.html">
+                                <i class="fas fa-book me-1"></i>
+                                <span>الكورسات</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fas fa-info-circle me-1"></i>
+                                <span>عن المنصة</span>
+                            </a>
+                        </li>
+                    </ul>
+
+                    <!-- أزرار تسجيل الدخول والتسجيل -->
+                    <div class="auth-actions" id="authBtns">
+                        <a href="login.html" class="auth-btn login-btn">
+                            <i class="fas fa-sign-in-alt"></i>
+                            <span>تسجيل الدخول</span>
+                        </a>
+                        <a href="register.html" class="auth-btn register-btn">
+                            <i class="fas fa-user-plus"></i>
+                            <span>إنشاء حساب</span>
+                        </a>
+                    </div>
+
+                    <!-- أزرار للمستخدمين المسجلين -->
+                    <div class="auth-actions d-none" id="userBtns">
+                        <a href="dashboard.html" class="auth-btn dashboard-btn">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>لوحة التحكم</span>
+                        </a>
+                        <button type="button" id="logoutBtn" class="auth-btn logout-btn">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>تسجيل خروج</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- محتوى الاشتراك -->
+    <div class="container" id="subscriptionContent">
+        <div class="row">
+            <div class="col-lg-8 mb-4 reveal">
+                <div class="course-header innovative">
+                    <div class="course-image-container">
+                        <img id="courseImage" src="" alt="صورة الكورس">
+                    </div>
+                    <div class="course-details-container">
+                        <h1 id="courseTitle"></h1>
+                        <p id="courseGrade"></p>
+                        <div class="course-meta">
+                            <span class="badge fw-bold px-3 py-2" style="background:#cce5ff; color:#000;">
+                                <span class="course-date"><i class="fas fa-play-circle me-2"></i>عدد محاضرات الكورس :
+                                    <span id="lectureCount"></span></span>
+                            </span>
+                            <span class="badge fw-bold px-3 py-2" style="background:#d4edda; color:#000;">
+                                <span class="course-duration"><i class="fas fa-calendar me-2"></i>تاريخ انشاء الكورس :
+                                    <span id="coursedate"></span></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                <div class="subscription-details">
+                    <div class="subscription-header">
+                        <i class="fas fa-info-circle"></i>
+                        <div class="subscription-title">تفاصيل الكورس</div>
+                    </div>
+                    <div class="subscription-content">
+                        <div class="subscription-info-grid">
+                            <div class="info-item">
+                                <div class="info-icon"><i class="fas fa-video"></i></div>
+                                <div class="info-content">
+                                    <div class="info-label">عدد المحاضرات</div>
+                                    <div class="info-value" id="videosCount">-</div>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-icon"><i class="fas fa-file-pdf"></i></div>
+                                <div class="info-content">
+                                    <div class="info-label">عدد المستندات</div>
+                                    <div class="info-value" id="documentsCount">-</div>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-icon"><i class="fas fa-clipboard-check"></i></div>
+                                <div class="info-content">
+                                    <div class="info-label">عدد الاختبارات</div>
+                                    <div class="info-value" id="examsCount">-</div>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-icon"><i class="fas fa-money-bill-wave"></i></div>
+                                <div class="info-content">
+                                    <div class="info-label">سعر الكورس</div>
+                                    <div class="info-value" id="coursePrice">-</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="subscription-status" id="subscriptionStatus">
+                            <div class="status-icon not-subscribed">
+                                <i class="fas fa-lock"></i>
+                            </div>
+                            <div class="status-text">
+                                <h3>الكورس غير مفعل</h3>
+                                <p>قم بتفعيل اشتراكك للوصول إلى محتوى الكورس بالكامل</p>
+                            </div>
+                        </div>
+                        <button id="subscribeBtn" class="subscribe-btn">
+                            <i class="fas fa-unlock-alt"></i>
+                            <span>اشتراك بالكورس</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 reveal">
+                <div class="sticky-container">
+                    <div class="card locked-content">
+                        <div class="card-header videos-header text-white" aria-expanded="false">
+                            <span><i class="fab fa-youtube"></i> المحاضرات</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="card-body" id="videosList">
+                            <div class="locked-overlay">
+                                <i class="fas fa-lock"></i>
+                                <p>محتوى مقفل</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card mt-4 locked-content">
+                        <div class="card-header documents-header text-white" aria-expanded="false">
+                            <span><i class="fas fa-file-pdf"></i> المستندات</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="card-body" id="activitiesList">
+                            <div class="locked-overlay">
+                                <i class="fas fa-lock"></i>
+                                <p>محتوى مقفل</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card mt-4 locked-content">
+                        <div class="card-header exams-header text-white" aria-expanded="false">
+                            <span><i class="fas fa-clipboard-check"></i> الاختبارات</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="card-body" id="examsList">
+                            <div class="locked-overlay">
+                                <i class="fas fa-lock"></i>
+                                <p>محتوى مقفل</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal for activation code -->
+    <div class="modal fade" id="activationModal" tabindex="-1" aria-labelledby="activationModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content activation-modal-content">
+                <div class="modal-header activation-modal-header">
+                    <div class="modal-title-wrapper">
+                        <h5 class="modal-title" id="activationModalLabel">تفعيل اشتراك الكورس</h5>
+                        <p class="modal-subtitle">أدخل كود التفعيل للوصول إلى محتوى الكورس</p>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body activation-modal-body">
+                    <div class="activation-form">
+                        <div class="activation-input-container">
+                            <label for="activationCode" class="activation-input-label">كود التفعيل</label>
+                            <input type="text" id="activationCode" class="activation-input form-control"
+                                placeholder="أدخل كود التفعيل المكون من 6 أرقام" maxlength="6" pattern="\d{6}" required>
+                            <div id="codeError" class="invalid-feedback text-center mt-2"></div>
+                        </div>
+
+                        <div class="activation-info">
+                            <div class="activation-info-header">
+                                <i class="fas fa-info-circle"></i>
+                                <span>معلومات هامة</span>
+                            </div>
+                            <p>يمكنك الحصول على كود التفعيل من خلال التواصل مع الدعم الفني</p>
+                        </div>
+
+                        <div class="purchase-options">
+                            <div class="purchase-option-header">
+                                <i class="fas fa-shopping-cart"></i>
+                                <span>طرق الحصول على الكود</span>
+                            </div>
+                            <div class="purchase-options-grid">
+                                <div class="purchase-option">
+                                    <div class="purchase-option-icon">
+                                        <i class="fas fa-credit-card"></i>
+                                    </div>
+                                    <div class="purchase-option-text">الدفع الإلكتروني</div>
+                                </div>
+                                <div class="purchase-option">
+                                    <div class="purchase-option-icon">
+                                        <i class="fas fa-university"></i>
+                                    </div>
+                                    <div class="purchase-option-text">تحويل بنكي</div>
+                                </div>
+                                <div class="purchase-option">
+                                    <div class="purchase-option-icon">
+                                        <i class="fas fa-store"></i>
+                                    </div>
+                                    <div class="purchase-option-text">من مقر المنصة</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer activation-modal-footer">
+                    <div class="activation-buttons">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                            <i class="fas fa-times"></i>
+                            <span>إلغاء</span>
+                        </button>
+                        <button type="button" class="btn btn-primary activation-submit-btn" id="activateBtn">
+                            <span class="btn-text">تفعيل الاشتراك</span>
+                            <span class="btn-loader d-none">
+                                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+                                <span>جاري التفعيل...</span>
+                            </span>
+                        </button>
+                    </div>
+                    <div class="support-link">
+                        <a href="#" id="supportLink">
+                            <i class="fas fa-headset"></i>
+                            <span>هل تواجه مشكلة؟ تواصل مع الدعم الفني</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal نجاح التفعيل -->
+    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content success-modal-content">
+                <div class="modal-body success-modal-body">
+                    <div class="success-icon-container">
+                        <div class="success-icon">
+                            <i class="fas fa-check"></i>
+                        </div>
+                    </div>
+                    <h3 class="success-title">تم تفعيل الاشتراك بنجاح!</h3>
+                    <p class="success-message">يمكنك الآن الوصول إلى جميع محتويات الكورس</p>
+                    <div class="success-buttons">
+                        <button type="button" class="btn btn-primary" id="viewCourseBtn">
+                            <i class="fas fa-play-circle"></i>
+                            <span>مشاهدة الكورس</span>
+                        </button>
+                        <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">
+                            <i class="fas fa-times"></i>
+                            <span>إغلاق</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button onclick="topFunction()" id="backToTopBtn" title="الرجوع إلى الأعلى">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+
+    <!-- تذييل الصفحة -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="container">
+                <div class="row g-4">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="footer-brand">
+                            <div class="footer-logo">
+                                <div class="logo-icon">
+                                    <i class="fas fa-graduation-cap"></i>
+                                </div>
+                                <div class="brand-text">
+                                    <span class="brand-title">NUMBER 1</span>
+                                    <span class="brand-slogan">منصة التعليم الرائدة</span>
+                                </div>
+                            </div>
+                            <p class="footer-description">منصة تعليمية متكاملة تهدف إلى تقديم أفضل المحتويات
+                                التعليمية
+                                بطرق مبتكرة وفعالة</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <div class="footer-links">
+                            <h4 class="footer-title">روابط سريعة</h4>
+                            <ul class="footer-menu">
+                                <li><a href="index.html"><i class="fas fa-chevron-left"></i> الرئيسية</a></li>
+                                <li><a href="courses.html"><i class="fas fa-chevron-left"></i> الكورسات</a></li>
+                                <li><a href="register.html"><i class="fas fa-chevron-left"></i>انشاء حساب</a></li>
+                                <li><a href="login.html"><i class="fas fa-chevron-left"></i> تسجيل الدخول</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <div class="footer-contact">
+                            <h4 class="footer-title">تواصل معنا</h4>
+                            <div class="social-links">
+                                <a href="https://www.facebook.com/share/19xa9j7611/" class="social-link facebook">
+                                    <i class="fab fa-facebook-f"></i>
+                                </a>
+                                <a href="#" class="social-link twitter">
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                                <a href="#" class="social-link instagram">
+                                    <i class="fab fa-instagram"></i>
+                                </a>
+                                <a href="https://wa.me/201552190276" class="social-link whatsapp">
+                                    <i class="fab fa-whatsapp"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container">
+                <div class="footer-copyright">
+                    <p class="mb-0">&copy; NUMBER 1 - جميع الحقوق محفوظة 2025</p>
+                    <div class="footer-credits">
+                        <p>
+                            <span>تم التطوير بواسطة</span>
+                            <a href="https://wa.me/201552190276">Khaled Osman</a> |
+                            <a href="https://www.facebook.com/share/19xa9j7611/">Education Plus</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/subscription.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // التحقق من حالة تسجيل الدخول
+            const isLoggedIn = !!localStorage.getItem('token');
+            const authBtns = document.getElementById('authBtns');
+            const userBtns = document.getElementById('userBtns');
+
+            if (isLoggedIn) {
+                authBtns.classList.add('d-none');
+                userBtns.classList.remove('d-none');
+            } else {
+                authBtns.classList.remove('d-none');
+                userBtns.classList.add('d-none');
+            }
+
+            // معالجة سلوك شريط التنقل على الشاشات المختلفة
+            const navbarCollapse = document.getElementById('navbarNav');
+
+            function adjustNavbar() {
+                if (window.innerWidth < 992) {
+                    // للشاشات الصغيرة - إزالة الظهور التلقائي وتغيير الأنماط
+                    navbarCollapse.classList.remove('show');
+                } else {
+                    // للشاشات الكبيرة - إضافة class للتأكد من العرض الصحيح
+                    navbarCollapse.classList.add('desktop-nav');
+                }
+            }
+
+            // تنفيذ عند تحميل الصفحة
+            adjustNavbar();
+
+            // تنفيذ عند تغيير حجم الشاشة
+            window.addEventListener('resize', adjustNavbar);
+
+            // إصلاح زر تسجيل الخروج
+            document.getElementById('logoutBtn').addEventListener('click', function () {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                sessionStorage.removeItem('token');
+                sessionStorage.removeItem('user');
+
+                // إظهار رسالة تم تسجيل الخروج بنجاح
+                alert('تم تسجيل الخروج بنجاح');
+
+                // إعادة تحميل الصفحة أو الانتقال لصفحة تسجيل الدخول
+                window.location.href = 'login.html';
+            });
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,1143 @@
+:root {
+    --primary-color: #2563eb;
+    --secondary-color: #f59e0b;
+    --accent-color: #10b981;
+    --text-dark: #1e293b;
+    --text-light: #64748b;
+    --gradient-primary: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    --divider-color: #f1f5f9;
+}
+
+/* Global Styles */
+body {
+    background-color: #ffffff;
+    font-family: 'Cairo', sans-serif;
+    color: var(--text-dark);
+    line-height: 1.7;
+    margin-top: 80px;
+}
+
+/* Course Cards */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* تحسينات جديدة لـ course card */
+.course-card {
+    background: white;
+    transition: all 0.3s ease;
+    position: relative;
+    margin-bottom: 2rem;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 100%;
+}
+
+.course-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(37, 99, 235, 0.15) !important;
+}
+
+.course-card .card-img-top {
+    transition: transform 0.5s ease;
+}
+
+.course-card:hover .card-img-top {
+    transform: scale(1.05);
+}
+
+.course-card .card-body {
+    padding: 1.5rem !important;
+}
+
+.course-card .card-title {
+    font-size: 1.25rem;
+    margin-bottom: 0.75rem;
+    line-height: 1.4;
+}
+
+.course-card .grade-badge {
+    background: rgba(37, 99, 235, 0.1);
+    color: var(--primary-color);
+    padding: 0.35rem 1rem;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    display: inline-block;
+    margin-bottom: 1rem;
+}
+
+.course-card .course-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1.5rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.course-card .lectures-count {
+    background: #f8fafc;
+    color: var(--text-dark);
+    padding: 0.35rem 1rem;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.course-card .rating {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--text-dark);
+    font-weight: 600;
+}
+
+.course-card .rating i {
+    color: #f59e0b;
+}
+
+.course-card .new-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: #dc2626;
+    color: white;
+    padding: 0.35rem 1rem;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    z-index: 1;
+}
+
+/* Modal Enhancements */
+.modal-content {
+    border-radius: 1rem;
+    overflow: hidden;
+    animation: fadeIn 0.4s ease-in-out;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.modal-header {
+    padding: 1rem 1.5rem;
+}
+
+.modal-body {
+    padding: 2rem;
+    background: #f8f9fa;
+}
+
+.modal-footer {
+    padding: 1rem 1.5rem;
+    background: #e9ecef;
+}
+
+* تذييل الصفحة */ .footer {
+    position: relative;
+    background: var(--text-dark);
+    color: white;
+    padding: 0;
+    margin-top: 6rem;
+}
+
+.footer-content {
+    padding: 4rem 0 2rem;
+    position: relative;
+    z-index: 1;
+}
+
+.footer-brand {
+    margin-bottom: 1.5rem;
+}
+
+.footer-logo {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.2rem;
+}
+
+.footer-logo .logo-icon {
+    width: 40px;
+    height: 40px;
+    transform: rotate(0);
+}
+
+.footer-logo .brand-title {
+    font-size: 1.4rem;
+}
+
+.footer-logo .brand-slogan {
+    font-size: 0.7rem;
+}
+
+.footer-description {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.95rem;
+    line-height: 1.7;
+    margin-bottom: 1.5rem;
+}
+
+.footer-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+    position: relative;
+    padding-bottom: 10px;
+    color: white;
+}
+
+.footer-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 50px;
+    height: 3px;
+    background: var(--gradient-primary);
+    border-radius: 3px;
+}
+
+.footer-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-menu li {
+    margin-bottom: 0.8rem;
+}
+
+.footer-menu a {
+    color: rgba(255, 255, 255, 0.7);
+    text-decoration: none;
+    transition: all 0.3s ease;
+    font-size: 0.95rem;
+    display: flex;
+    align-items: center;
+}
+
+.footer-menu a i {
+    margin-left: 0.5rem;
+    font-size: 0.8rem;
+    transition: transform 0.3s ease;
+}
+
+.footer-menu a:hover {
+    color: var(--secondary-color);
+    transform: translateX(-5px);
+}
+
+.footer-menu a:hover i {
+    transform: translateX(-3px);
+}
+
+.footer .social-links {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+}
+
+.footer .social-link {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+}
+
+.social-link.whatsapp {
+    background: #25D366;
+}
+
+.footer-bottom {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 1.5rem 0;
+    text-align: center;
+}
+
+.footer-copyright {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.footer-copyright p {
+    margin: 0;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+}
+
+.footer-credits {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.footer-credits a {
+    color: var(--secondary-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer-credits a:hover {
+    color: white;
+}
+
+@media (max-width: 767px) {
+    .footer {
+        margin-top: 4rem;
+    }
+
+    .footer-content {
+        padding: 3rem 0 1.5rem;
+    }
+
+    .footer-waves {
+        top: -40px;
+    }
+
+    .footer-waves svg {
+        height: 40px;
+    }
+
+    .footer-title {
+        margin-top: 1.5rem;
+    }
+}
+
+/* تحسين تأثير القائمة المنسدلة */
+.notification-menu {
+    width: 350px;
+    border-radius: 12px;
+    padding: 0;
+    overflow: hidden;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    margin-top: 15px !important;
+    animation: dropdown-fade 0.3s ease;
+}
+
+@keyframes dropdown-fade {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* تصميم محسن لشارة عدد الإشعارات مع تأثير النبض */
+.notification-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: #ef4444;
+    color: white;
+    font-size: 0.7rem;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 5px;
+    border-radius: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    font-weight: bold;
+    z-index: 2;
+    transform: scale(1);
+    transition: transform 0.2s ease;
+}
+
+/* تأثير النبض لشارة الإشعارات */
+@keyframes pulse-badge {
+    0% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+
+    70% {
+        box-shadow: 0 0 0 8px rgba(239, 68, 68, 0);
+        transform: scale(1);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+        transform: scale(1);
+    }
+}
+
+/* تطبيق تأثير النبض عندما يكون هناك إشعارات */
+#notificationCountBadge:not(:empty) {
+    animation: pulse-badge 2s infinite cubic-bezier(0.66, 0, 0, 1);
+}
+
+/* تأثير هالة حول الزر عند وجود إشعارات */
+.notification-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 50%;
+    background: rgba(37, 99, 235, 0.05);
+    transform: scale(0);
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.notification-btn:hover::before,
+.notification-btn:focus::before {
+    transform: scale(1.2);
+    opacity: 1;
+}
+
+.notification-btn:hover i {
+    animation: bell-notification 5s ease infinite;
+}
+
+/* تصميم محسن لصندوق البحث */
+.search-container {
+    flex: 1;
+    max-width: 400px;
+    margin-right: auto;
+}
+
+.search-bar-wrapper {
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.search-input {
+    border-radius: 50px !important;
+    padding: 0.75rem 1rem 0.75rem 3rem !important;
+    border: 1px solid rgba(37, 99, 235, 0.1) !important;
+    transition: all 0.3s ease;
+    background-color: #f8fafc !important;
+    font-size: 0.95rem;
+    font-weight: 500;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2) !important;
+}
+
+.search-input:focus {
+    border-color: var(--primary-color) !important;
+    background-color: white !important;
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.1) !important;
+    transform: translateY(-2px);
+    outline: none;
+}
+
+.search-input::placeholder {
+    color: #a0aec0;
+    font-weight: 400;
+}
+
+.search-icon {
+    position: absolute;
+    left: 1.2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--primary-color);
+    font-size: 1rem;
+    pointer-events: none;
+    opacity: 0.7;
+    transition: all 0.3s ease;
+}
+
+.search-input:focus+.search-icon {
+    color: var(--primary-color);
+    opacity: 1;
+}
+
+/* إضافة تأثير نبض لعداد الكورسات عند تحديثه */
+@keyframes countPulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.courses-count.updated {
+    animation: countPulse 0.6s ease;
+}
+
+/* تعديل لعرض أيقونة الـ select بشكل صحيح */
+.enhanced-modal .input-icon-wrapper .fa-graduation-cap {
+    z-index: 5;
+}
+
+/* ===== تصميم زر الإشعارات ===== */
+.notification-dropdown {
+    margin-right: 25px;
+    /* المسافة بعد الشعار */
+    position: relative;
+
+}
+
+/* زر الإشعارات */
+.notification-btn {
+    background: transparent;
+    border: none;
+    color: var(--primary-color);
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: all 0.3s ease;
+    padding: 0;
+    overflow: visible;
+    /* للسماح للشارة بالظهور خارج حدود الزر */
+}
+
+.notification-btn:focus {
+    box-shadow: none;
+    outline: none;
+}
+
+.notification-btn::after {
+    display: none !important;
+    /* إزالة السهم */
+}
+
+.notification-btn i {
+    font-size: 24px;
+    color: var(--primary-color);
+    position: relative;
+    z-index: 1;
+}
+
+.notification-btn:hover {
+    background-color: rgba(37, 99, 235, 0.1);
+    transform: translateY(-3px);
+}
+
+/* تأثير نبض إضافي عند تحميل الإشعارات الجديدة */
+@keyframes emphasis-pulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.08);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+.new-notification-badge {
+    background-color: #10b981;
+    color: white;
+    font-size: 0.7rem;
+    padding: 3px 10px;
+    border-radius: 50px;
+    font-weight: bold;
+    margin-right: 15px;
+    white-space: nowrap;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+    animation: emphasis-pulse 2s ease infinite;
+}
+
+/* تصميم شارة جديد داخل قائمة الإشعارات */
+#notificationsDropdown li:only-child {
+    text-align: center;
+    padding: 15px;
+    color: var(--text-light);
+}
+
+/* تأثير الاهتزاز لأيقونة الجرس */
+@keyframes bell-notification {
+    0% {
+        transform: rotate(0);
+    }
+
+    5% {
+        transform: rotate(15deg);
+    }
+
+    10% {
+        transform: rotate(-15deg);
+    }
+
+    15% {
+        transform: rotate(10deg);
+    }
+
+    20% {
+        transform: rotate(-10deg);
+    }
+
+    25% {
+        transform: rotate(5deg);
+    }
+
+    30% {
+        transform: rotate(0);
+    }
+
+    100% {
+        transform: rotate(0);
+    }
+}
+
+/* تطبيق التأثير على أيقونة الجرس عند وجود إشعارات */
+.notification-btn i {
+    font-size: 24px;
+    color: var(--primary-color);
+    position: relative;
+    z-index: 1;
+}
+
+/* تشغيل الرسوم المتحركة لأيقونة الجرس عند وجود إشعارات */
+#notificationCountBadge:not(:empty)~i {
+    animation: bell-notification 5s ease infinite;
+}
+
+/* تحسين قائمة الإشعارات لإضافة تأثير بصري */
+#notificationsDropdown li {
+    padding: 15px;
+    border-bottom: 1px solid rgba(37, 99, 235, 0.1);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+#notificationsDropdown li:hover {
+    background-color: rgba(37, 99, 235, 0.05);
+    padding-right: 20px;
+    transition: all 0.3s ease;
+}
+
+#notificationsDropdown li:active {
+    background-color: rgba(37, 99, 235, 0.1);
+    transform: scale(0.98);
+}
+
+/* تأثير الظل عند التحويم على شارة "جديد" */
+.new-notification-badge:hover {
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.5);
+}
+
+/* تأثير مضيء للشارة الرئيسية خلف الجرس */
+.notification-btn::after {
+    content: '';
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0) 70%);
+    z-index: 0;
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+#notificationCountBadge:not(:empty)~.notification-btn::after {
+    opacity: 1;
+    transform: scale(2);
+}
+
+/* تأثير محسن عند التحويم على زر الإشعارات */
+.notification-btn:hover {
+    transform: translateY(-2px);
+}
+
+.notification-btn:active {
+    transform: translateY(1px);
+}
+
+/* تعديل موضع قائمة الإشعارات لتظهر أسفل navbar مباشرة */
+@media (max-width: 767px) {
+
+    /* وضع القائمة المنسدلة أسفل navbar مباشرة */
+    .notification-dropdown .notification-menu {
+        left: 50% !important;
+        right: auto !important;
+        transform: translateX(-50%) !important;
+        position: fixed !important;
+        top: 90px !important;
+        /* المحاذاة مع الـ navbar بالضبط */
+        width: 90% !important;
+        max-width: 350px !important;
+        margin-top: 0 !important;
+        z-index: 1050 !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+    }
+
+    /* إضافة خلفية مظللة عند فتح القائمة - خفيفة جدا للتركيز أكثر على القائمة */
+    .notification-dropdown.show::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.3);
+        z-index: 1040;
+    }
+
+    /* تعديل حجم القائمة لضمان رؤيتها بالكامل */
+    .notification-menu {
+        max-height: 70vh !important;
+        overflow-y: auto !important;
+        border-radius: 15px !important;
+    }
+}
+
+/* إضافة فئة للجسم لمنع التمرير عند فتح القائمة في الهاتف */
+body.notification-open {
+    overflow: hidden;
+}
+
+/* تصميم محسن لقسم عنوان الكورسات وصندوق البحث */
+.courses-section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 1rem 1.5rem;
+    border-bottom: 1px solid var(--divider-color);
+    margin-top: 1rem;
+    position: relative;
+    flex-wrap: wrap;
+}
+
+/* منطقة العنوان */
+.title-area {
+    display: inline-block;
+    margin-bottom: 1rem;
+}
+
+/* تصميم العنوان نفسه */
+.courses-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--primary-color);
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1rem;
+    display: inline-flex;
+    align-items: center;
+}
+
+/* تصميم الزخرفة أسفل العنوان */
+.courses-decoration {
+    height: 4px;
+    width: 100px;
+    background: var(--gradient-primary);
+    border-radius: 4px;
+    margin-top: 8px;
+}
+
+/* تحسين تصميم عداد الكورسات */
+.courses-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(37, 99, 235, 0.2) 100%);
+    color: var(--primary-color);
+    padding: 0.4rem 1.2rem;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin-right: 1rem;
+    vertical-align: middle;
+    box-shadow: 0 3px 10px rgba(37, 99, 235, 0.15);
+    border: 1px solid rgba(37, 99, 235, 0.1);
+    transition: all 0.3s ease;
+    position: relative;
+    top: 0;
+}
+
+.courses-count:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(37, 99, 235, 0.25);
+    background: linear-gradient(135deg, rgba(37, 99, 235, 0.15) 0%, rgba(37, 99, 235, 0.25) 100%);
+}
+
+.courses-count i {
+    margin-left: 0.6rem;
+    font-size: 0.9rem;
+    color: var(--primary-color);
+    background: rgba(255, 255, 255, 0.6);
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(37, 99, 235, 0.2);
+}
+
+/* تصميم متجاوب */
+@media (max-width: 768px) {
+    .courses-section-header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 0 0 1rem 0;
+    }
+
+    .search-container {
+        width: 100%;
+        max-width: 100%;
+        margin-top: 1rem;
+    }
+
+    .courses-title {
+        font-size: 1.75rem;
+    }
+
+    .courses-count {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.75rem;
+    }
+
+    .courses-decoration {
+        max-width: 120px;
+    }
+}
+
+@media (max-width: 576px) {
+    .courses-title {
+        font-size: 1.5rem;
+    }
+
+    .courses-count {
+        font-size: 0.7rem;
+        padding: 0.2rem 0.7rem;
+    }
+
+    .courses-count i {
+        font-size: 0.8rem;
+        width: 18px;
+        height: 18px;
+    }
+}
+
+/* أنيميشن لعنصر البحث */
+@keyframes searchPulse {
+    0% {
+        box-shadow: 0 4px 15px rgba(37, 99, 235, 0.05);
+    }
+
+    50% {
+        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.15);
+    }
+
+    100% {
+        box-shadow: 0 4px 15px rgba(37, 99, 235, 0.05);
+    }
+}
+
+.search-bar-wrapper:hover .search-input {
+    animation: searchPulse 2s infinite;
+}
+
+/* تحسين مظهر رسالة عدم وجود كورسات */
+#noCoursesMessage {
+    background: white;
+    border: 2px dashed rgba(37, 99, 235, 0.2);
+    padding: 3rem 2rem;
+    border-radius: 15px;
+    text-align: center;
+    margin-top: 2rem;
+    transition: all 0.3s ease;
+}
+
+#noCoursesMessage p {
+    color: var(--text-light);
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+#noCoursesMessage i {
+    font-size: 3rem;
+    color: rgba(37, 99, 235, 0.3);
+    display: block;
+    margin-bottom: 1rem;
+}
+
+/* تحسين المحاذاة في العنوان والزخرفة */
+.courses-title .title-text {
+    display: inline-block;
+    position: relative;
+}
+
+.courses-decoration {
+    position: relative;
+    width: 100%;
+    max-width: 150px;
+    height: 4px;
+    background: var(--gradient-primary);
+    border-radius: 4px;
+    margin-top: 0.5rem;
+    margin-right: 0;
+    display: block;
+}
+
+/* ===== تحسينات Modal الجديدة ===== */
+.enhanced-modal .modal-content {
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    animation: modalFadeIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-30px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.enhanced-modal .modal-header {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    color: white;
+    padding: 1.5rem 2rem;
+    position: relative;
+    border: none;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.enhanced-modal .btn-close {
+    position: absolute;
+    left: 1.5rem;
+    background-color: rgba(255, 255, 255, 0.3);
+    padding: 0.6rem;
+    border-radius: 50%;
+    opacity: 1;
+    transition: all 0.3s ease;
+}
+
+.enhanced-modal .btn-close:hover {
+    background-color: rgba(255, 255, 255, 0.5);
+    transform: rotate(90deg);
+}
+
+.enhanced-modal .btn-secondary {
+    background-color: #475569;
+    color: white;
+    border: none;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.enhanced-modal .btn-secondary:hover {
+    background-color: #334155;
+    color: white;
+    transform: translateY(-2px);
+}
+
+.enhanced-modal .btn-primary i {
+    margin-left: 8px;
+}
+
+.enhanced-modal .modal-title {
+    padding-right: 0;
+    margin-right: 0;
+    text-align: right;
+    width: 100%;
+}
+
+/* تحسينات نموذج البروفايل */
+.enhanced-modal .form-label {
+    font-weight: 600;
+    color: var(--text-dark);
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.enhanced-modal .form-control,
+.enhanced-modal .form-select {
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+    border: 2px solid #e2e8f0;
+    background-color: #f8fafc;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.enhanced-modal .form-control:focus,
+.enhanced-modal .form-select:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+    background-color: white;
+}
+
+.enhanced-modal .form-text {
+    color: var(--text-light);
+    font-size: 0.85rem;
+    margin-top: 0.5rem;
+}
+
+.enhanced-modal .btn {
+    padding: 0.75rem 2rem;
+    border-radius: 50px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.enhanced-modal .btn-primary {
+    background: var(--gradient-primary);
+    border: none;
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+}
+
+.enhanced-modal .btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+}
+
+.enhanced-modal .btn-secondary {
+    background: #f1f5f9;
+    color: var(--text-dark);
+    border: none;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+.enhanced-modal .btn-secondary:hover {
+    background: #e2e8f0;
+    transform: translateY(-2px);
+}
+
+/* تأثيرات إضافية  */
+.enhanced-modal .input-icon-wrapper {
+    position: relative;
+}
+
+.enhanced-modal .input-icon {
+    position: absolute;
+    left: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--primary-color);
+    opacity: 0.7;
+}
+
+.enhanced-modal .icon-input {
+    padding-left: 3rem;
+}
+
+/* تصميم متجاوب */
+@media (max-width: 576px) {
+    .enhanced-modal .modal-header {
+        padding: 1.2rem 1.5rem;
+    }
+
+    .enhanced-modal .modal-body {
+        padding: 1.5rem;
+    }
+
+    .enhanced-modal .modal-footer {
+        padding: 1rem 1.5rem;
+    }
+
+    .enhanced-modal .modal-title {
+        font-size: 1.3rem;
+    }
+
+    .enhanced-modal .btn {
+        padding: 0.6rem 1.5rem;
+    }
+}
+
+/* تحسين تصميم رأس Modal والأيقونات */
+.enhanced-modal .modal-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-.895 3-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zm63 31c1.657 0 3-.895 3-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM34 90c1.657 0 3-.895 3-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.657 0 3-.895 3-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.05' fill-rule='evenodd'/%3E%3C/svg%3E");
+    opacity: 0.3;
+}
+
+/* تعديل ظهور الأيقونات في العنوان */
+.enhanced-modal .modal-title i {
+    margin-left: 12px;
+    font-size: 1.5rem;
+    background: rgba(255, 255, 255, 0.2);
+    width: 40px;
+    height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+/* تأثير تحويم لأيقونة العنوان */
+.enhanced-modal .modal-title i:hover {
+    transform: scale(1.1) rotate(5deg);
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* تعديل select في الصف الدراسي لإضافة مسافة بين السهم والنص */
+.enhanced-modal .form-select {
+    padding-left: 2.5rem !important;
+    background-position: left 1rem center !important;
+    background-size: 16px 12px !important;
+}
+
+/* تعديل اتجاه سهم قائمة الصف الدراسي ليكون في الاتجاه المعاكس للأيقونة */
+.enhanced-modal #grade.form-select {
+    padding-right: 3rem !important;
+    padding-left: 1rem !important;
+    background-position: right 1rem center !important;
+    direction: rtl;
+}
+
+/* تعديل عرض القوائم المنسدلة */
+.enhanced-modal select.form-select option {
+    padding: 10px;
+    font-size: 0.95rem;
+}
+
+/* تحسين أيقونات الحقول */
+.enhanced-modal .input-icon {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--primary-color);
+    background: rgba(37, 99, 235, 0.1);
+    border-radius: 50%;
+    padding: 5px;
+}

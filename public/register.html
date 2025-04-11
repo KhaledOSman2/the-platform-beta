@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>إنشاء حساب جديد</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body style="margin-top: 120px;">
+    <!-- شريط تنقل محسّن -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="navbar-inner">
+                <!-- الشعار والعلامة التجارية -->
+                <div class="navbar-brand-wrapper">
+                    <a class="navbar-brand" href="index.html">
+                        <div class="logo-icon">
+                            <i class="fas fa-graduation-cap"></i>
+                        </div>
+                        <div class="brand-text">
+                            <span class="brand-title">NUMBER 1</span>
+                            <span class="brand-slogan">منصة التعليم الرائدة</span>
+                        </div>
+                    </a>
+                </div>
+
+                <!-- زر القائمة المنسدلة للشاشات الصغيرة فقط -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                    <i class="fas fa-bars"></i>
+                </button>
+
+                <div class="navbar-collapse" id="navbarNav">
+                    <!-- روابط التنقل - الآن على نفس السطر في سطح المكتب -->
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">
+                                <i class="fas fa-home me-1"></i>
+                                <span>الرئيسية</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="courses.html">
+                                <i class="fas fa-book me-1"></i>
+                                <span>الكورسات</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#">
+                                <i class="fas fa-info-circle me-1"></i>
+                                <span>عن المنصة</span>
+                            </a>
+                        </li>
+                    </ul>
+
+                    <!-- أزرار تسجيل الدخول والتسجيل -->
+                    <div class="auth-actions" id="authBtns">
+                        <a href="login.html" class="auth-btn login-btn">
+                            <i class="fas fa-sign-in-alt"></i>
+                            <span>تسجيل الدخول</span>
+                        </a>
+                        <a href="register.html" class="auth-btn register-btn">
+                            <i class="fas fa-user-plus"></i>
+                            <span>إنشاء حساب</span>
+                        </a>
+                    </div>
+
+                    <!-- أزرار للمستخدمين المسجلين -->
+                    <div class="auth-actions d-none" id="userBtns">
+                        <a href="dashboard.html" class="auth-btn dashboard-btn">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>لوحة التحكم</span>
+                        </a>
+                        <button type="button" id="logoutBtn" class="auth-btn logout-btn">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span>تسجيل خروج</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+
+    <!-- نموذج إنشاء حساب جديد بتصميم جديد محسن -->
+    <div class="container">
+        <div class="row justify-content-center mt-5">
+            <div class="col-md-6">
+                <div class="login-card">
+                    <h2>إنشاء حساب جديد</h2>
+                    <form id="registerForm">
+                        <div class="mb-4">
+                            <label for="username" class="form-label">اسم المستخدم</label>
+                            <div class="position-relative">
+                                <input type="text" class="form-control" id="username" placeholder="أدخل اسم المستخدم"
+                                    required>
+                                <i class="fas fa-user form-icon"></i>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="email" class="form-label">البريد الإلكتروني</label>
+                            <div class="position-relative">
+                                <input type="email" class="form-control" id="email" placeholder="أدخل بريدك الإلكتروني"
+                                    required>
+                                <i class="fas fa-envelope form-icon"></i>
+                            </div>
+                        </div>
+                        <div class="mb-4 position-relative">
+                            <label for="password" class="form-label">كلمة المرور</label>
+                            <div class="position-relative">
+                                <input type="password" class="form-control" id="password" placeholder="أدخل كلمة المرور"
+                                    required>
+                                <i class="fas fa-lock form-icon"></i>
+                                <span class="toggle-password" id="toggleRegisterPassword">
+                                    <i class="fa fa-eye-slash"></i>
+                                </span>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label for="grade" class="form-label">الصف الدراسي</label>
+                            <div class="position-relative">
+                                <select class="form-control" id="grade" required></select>
+                                <i class="fas fa-graduation-cap form-icon"></i>
+                            </div>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-custom">
+                                <i class="fas fa-user-plus me-2"></i>
+                                إنشاء حساب
+                            </button>
+                        </div>
+                    </form>
+                    <div class="login-footer">
+                        <p>هل لديك حساب بالفعل؟ <a href="login.html">تسجيل الدخول</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- تذييل الصفحة -->
+    <footer class="footer">
+
+        <div class="footer-content">
+            <div class="container">
+                <div class="row g-4">
+                    <div class="col-lg-4 col-md-6">
+                        <div class="footer-brand">
+                            <div class="footer-logo">
+                                <div class="logo-icon">
+                                    <i class="fas fa-graduation-cap"></i>
+                                </div>
+                                <div class="brand-text">
+                                    <span class="brand-title">NUMBER 1</span>
+                                    <span class="brand-slogan">منصة التعليم الرائدة</span>
+                                </div>
+                            </div>
+                            <p class="footer-description">منصة تعليمية متكاملة تهدف إلى تقديم أفضل المحتويات التعليمية
+                                بطرق مبتكرة وفعالة</p>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <div class="footer-links">
+                            <h4 class="footer-title">روابط سريعة</h4>
+                            <ul class="footer-menu">
+                                <li><a href="index.html"><i class="fas fa-chevron-left"></i> الرئيسية</a></li>
+                                <li><a href="courses.html"><i class="fas fa-chevron-left"></i> الكورسات</a></li>
+                                <li><a href="register.html"><i class="fas fa-chevron-left"></i>انشاء حساب</a></li>
+                                <li><a href="login.html"><i class="fas fa-chevron-left"></i> تسجيل الدخول</a></li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3 col-md-6">
+                        <div class="footer-contact">
+                            <h4 class="footer-title">تواصل معنا</h4>
+                            <div class="social-links">
+                                <a href="https://www.facebook.com/share/19xa9j7611/" class="social-link facebook">
+                                    <i class="fab fa-facebook-f"></i>
+                                </a>
+                                <a href="#" class="social-link twitter">
+                                    <i class="fab fa-twitter"></i>
+                                </a>
+                                <a href="#" class="social-link instagram">
+                                    <i class="fab fa-instagram"></i>
+                                </a>
+                                <a href="https://wa.me/201552190276" class="social-link whatsapp">
+                                    <i class="fab fa-whatsapp"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <div class="container">
+                <div class="footer-copyright">
+                    <p class="mb-0">&copy; NUMBER 1 - جميع الحقوق محفوظة 2025</p>
+                    <div class="footer-credits">
+                        <p>
+                            <span>تم التطوير بواسطة</span>
+                            <a href="https://wa.me/201552190276">Khaled Osman</a> |
+                            <a href="https://www.facebook.com/share/19xa9j7611/">Education Plus</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/main.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // التحقق من حالة تسجيل الدخول
+            const isLoggedIn = !!localStorage.getItem('token');
+            const authBtns = document.getElementById('authBtns');
+            const userBtns = document.getElementById('userBtns');
+
+            if (isLoggedIn) {
+                authBtns.classList.add('d-none');
+                userBtns.classList.remove('d-none');
+            } else {
+                authBtns.classList.remove('d-none');
+                userBtns.classList.add('d-none');
+            }
+
+            // معالجة سلوك شريط التنقل على الشاشات المختلفة
+            const navbarCollapse = document.getElementById('navbarNav');
+
+            function adjustNavbar() {
+                if (window.innerWidth < 992) {
+                    // للشاشات الصغيرة - إزالة الظهور التلقائي وتغيير الأنماط
+                    navbarCollapse.classList.remove('show');
+                } else {
+                    // للشاشات الكبيرة - إضافة class للتأكد من العرض الصحيح
+                    navbarCollapse.classList.add('desktop-nav');
+                }
+            }
+
+            // تنفيذ عند تحميل الصفحة
+            adjustNavbar();
+
+            // تنفيذ عند تغيير حجم الشاشة
+            window.addEventListener('resize', adjustNavbar);
+
+            // إصلاح زر تسجيل الخروج
+            document.getElementById('logoutBtn').addEventListener('click', function () {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                sessionStorage.removeItem('token');
+                sessionStorage.removeItem('user');
+
+                // إظهار رسالة تم تسجيل الخروج بنجاح
+                alert('تم تسجيل الخروج بنجاح');
+
+                // إعادة تحميل الصفحة أو الانتقال لصفحة تسجيل الدخول
+                window.location.href = 'login.html';
+            });
+
+            // Handle registration form submission
+            const registerForm = document.getElementById('registerForm');
+            registerForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const username = document.getElementById('username').value.trim();
+                const email = document.getElementById('email').value.trim().toLowerCase();
+                const password = document.getElementById('password').value;
+                const grade = document.getElementById('grade').value;
+                try {
+                    const response = await fetch('/api/register', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ username, email, password, grade })
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                        alert(data.message);
+                        // Automatic login after registration
+                        const loginResponse = await fetch('/api/login', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ email, password })
+                        });
+                        const loginData = await loginResponse.json();
+                        if (loginResponse.ok) {
+                            localStorage.setItem('token', loginData.token);
+                            window.location.href = 'dashboard.html';
+                        } else {
+                            alert(loginData.message);
+                        }
+                    } else {
+                        alert(data.message);
+                    }
+                } catch (err) {
+                    console.error('Error during registration:', err);
+                    alert('حدث خطأ أثناء إنشاء الحساب. حاول مرة أخرى.');
+                }
+            });
+            // Toggle password visibility for register page
+            const toggleReg = document.getElementById('toggleRegisterPassword');
+            if (toggleReg) {
+                toggleReg.addEventListener('click', function () {
+                    const passwordField = document.getElementById('password');
+                    const newType = passwordField.getAttribute('type') === 'password' ? 'text' : 'password';
+                    passwordField.setAttribute('type', newType);
+                    this.firstElementChild.classList.toggle('fa-eye');
+                    this.firstElementChild.classList.toggle('fa-eye-slash');
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>
