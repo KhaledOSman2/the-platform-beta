@@ -158,6 +158,7 @@
                         <button class="btn btn-sm btn-outline-primary active" data-filter="all">جميع الأكواد</button>
                         <button class="btn btn-sm btn-outline-success" data-filter="active">الأكواد النشطة</button>
                         <button class="btn btn-sm btn-outline-secondary" data-filter="used">الأكواد المستخدمة</button>
+                        <button class="btn btn-sm btn-outline-warning" data-filter="disabled">الأكواد المعطلة</button>
                     </div>
 
                     <!-- جدول أكواد التفعيل -->
@@ -167,9 +168,7 @@
                                 <tr>
                                     <th>#</th>
                                     <th>كود التفعيل</th>
-                                    <th>نوع الاشتراك</th>
                                     <th>تاريخ الإنشاء</th>
-                                    <th>تاريخ الانتهاء</th>
                                     <th>الحالة</th>
                                     <th>المستخدم</th>
                                     <th>تاريخ الاستخدام</th>
@@ -211,6 +210,9 @@
                         </button>
                         <button id="exportUsedCodes" class="btn btn-outline-secondary">
                             <i class="fas fa-file-export me-1"></i> تصدير الأكواد المستخدمة
+                        </button>
+                        <button id="exportDisabledCodes" class="btn btn-outline-warning">
+                            <i class="fas fa-file-export me-1"></i> تصدير الأكواد المعطلة
                         </button>
                     </div>
                 </div>
@@ -260,31 +262,39 @@
                                     <label for="codeCount" class="form-label">عدد الأكواد</label>
                                     <input type="number" class="form-control" id="codeCount" min="1" max="100"
                                         value="1">
-                                    <div class="form-text">أقصى عدد يمكن إنشاؤه دفعة واحدة هو 100 كود.</div>
                                 </div>
                                 <div class="col-md-6">
-                                    <label for="subscriptionType" class="form-label">نوع الاشتراك</label>
-                                    <select class="form-select" id="subscriptionType">
-                                        <option value="basic">اشتراك أساسي (كورس واحد)</option>
-                                        <option value="standard">اشتراك قياسي (3 كورسات)</option>
-                                        <option value="premium">اشتراك متميز (جميع الكورسات)</option>
+                                    <label for="codeGrade" class="form-label">الصف الدراسي</label>
+                                    <select class="form-select" id="codeGrade">
+                                        <option value="">اختر الصف الدراسي</option>
+                                        <!-- سيتم ملء هذه القائمة ديناميكيًا -->
                                     </select>
                                 </div>
                             </div>
-                            <div class="row mb-3">
-                                <div class="col-md-6">
-                                    <label for="expiryDate" class="form-label">تاريخ انتهاء الصلاحية</label>
-                                    <input type="date" class="form-control" id="expiryDate">
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="codePrefix" class="form-label">بادئة الكود (اختياري)</label>
-                                    <input type="text" class="form-control" id="codePrefix" maxlength="5"
-                                        placeholder="مثال: EGY-">
-                                </div>
-                            </div>
                             <div class="mb-3">
-                                <label for="notes" class="form-label">ملاحظات (اختياري)</label>
-                                <textarea class="form-control" id="notes" rows="2"></textarea>
+                                <div class="courses-select-container">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <label for="selectedCourses" class="form-label mb-0">الكورسات المتاحة</label>
+                                        <button type="button" class="btn btn-sm btn-outline-primary" id="toggleAllCourses">
+                                            <i class="fas fa-check-square me-1"></i> تحديد الكل
+                                        </button>
+                                    </div>
+                                    <div class="courses-select-wrapper p-3 border rounded">
+                                        <div class="courses-loading text-center py-4 d-none">
+                                            <div class="spinner-border text-primary" role="status">
+                                                <span class="visually-hidden">جاري التحميل...</span>
+                                            </div>
+                                            <p class="mt-2 text-muted">جاري تحميل الكورسات...</p>
+                                        </div>
+                                        <div class="courses-empty text-center py-4">
+                                            <i class="fas fa-info-circle fa-2x text-muted mb-2"></i>
+                                            <p class="text-muted">يرجى اختيار الصف الدراسي أولاً لعرض الكورسات المتاحة.</p>
+                                        </div>
+                                        <div id="coursesList" class="course-checkboxes d-none">
+                                            <!-- سيتم ملء هذه القائمة ديناميكيًا -->
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </form>
                     </div>
@@ -312,16 +322,8 @@
                             </div>
                             <table class="table table-bordered">
                                 <tr>
-                                    <th>نوع الاشتراك</th>
-                                    <td id="viewSubscriptionType">-</td>
-                                </tr>
-                                <tr>
                                     <th>تاريخ الإنشاء</th>
                                     <td id="viewCreationDate">-</td>
-                                </tr>
-                                <tr>
-                                    <th>تاريخ الانتهاء</th>
-                                    <td id="viewExpiryDate">-</td>
                                 </tr>
                                 <tr>
                                     <th>الحالة</th>
@@ -336,8 +338,14 @@
                                     <td id="viewUsageDate">-</td>
                                 </tr>
                                 <tr>
-                                    <th>ملاحظات</th>
-                                    <td id="viewNotes">-</td>
+                                    <th>الصف الدراسي</th>
+                                    <td id="viewGrade">-</td>
+                                </tr>
+                                <tr>
+                                    <th>الكورسات</th>
+                                    <td>
+                                        <div id="viewCoursesList" class="code-courses-list"></div>
+                                    </td>
                                 </tr>
                             </table>
                         </div>

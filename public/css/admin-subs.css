@@ -92,6 +92,24 @@
     background-color: #f8fafc;
 }
 
+/* Course badges in details modal */
+.code-courses-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.course-badge {
+    background-color: #e0e7ff; /* Light indigo background */
+    color: #4338ca; /* Indigo text */
+    padding: 0.3rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+    border: 1px solid #c7d2fe; /* Light indigo border */
+}
+
 /* Create codes form styling */
 #createCodesForm .form-control,
 #createCodesForm .form-select {
@@ -111,6 +129,100 @@
     color: #6b7280;
     font-size: 0.85rem;
     margin-top: 0.25rem;
+}
+
+/* Course selection styling */
+.courses-select-wrapper {
+    max-height: 300px;
+    overflow-y: auto;
+    background-color: #fcfcfc;
+    border-radius: 0.5rem;
+    border-color: #dfe3e8 !important;
+}
+
+.courses-select-wrapper::-webkit-scrollbar {
+    width: 8px;
+}
+
+.courses-select-wrapper::-webkit-scrollbar-thumb {
+    background-color: #cbd5e1;
+    border-radius: 4px;
+}
+
+.courses-select-wrapper::-webkit-scrollbar-track {
+    background-color: #f1f5f9;
+    border-radius: 4px;
+}
+
+.course-checkboxes {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 0.75rem;
+}
+
+.course-item {
+    position: relative;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    border: 1px solid #e5e7eb;
+    transition: all 0.2s ease;
+    background-color: white;
+}
+
+.course-item:hover {
+    border-color: #bfdbfe;
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.1);
+}
+
+.course-item.selected {
+    background-color: #eff6ff;
+    border-color: #93c5fd;
+}
+
+.course-item label {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    cursor: pointer;
+    margin-bottom: 0;
+}
+
+.course-item input[type="checkbox"] {
+    margin-left: 0.5rem;
+    width: 1.25rem;
+    height: 1.25rem;
+    border-radius: 0.25rem;
+    border: 1px solid #d1d5db;
+    cursor: pointer;
+}
+
+.course-item .course-title {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #374151;
+    flex-grow: 1;
+    margin-right: 0.5rem;
+}
+
+#toggleAllCourses {
+    font-size: 0.85rem;
+    padding: 0.3rem 0.75rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+}
+
+#toggleAllCourses:hover {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.courses-empty, .courses-loading {
+    padding: 2rem 1rem;
+}
+
+.courses-empty i, .courses-loading .spinner-border {
+    color: #94a3b8;
+    margin-bottom: 0.75rem;
 }
 
 /* Responsive styles */
@@ -149,6 +261,10 @@
     #codesTable .btn i {
         font-size: 0.9rem;
     }
+
+    .course-checkboxes {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    }
 }
 
 @media (max-width: 576px) {
@@ -180,4 +296,31 @@
         font-size: 1.2rem;
         padding: 0.75rem;
     }
+
+    .course-checkboxes {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* مؤشر التحميل لعملية التصدير */
+.export-loading {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    color: white;
+    font-size: 1.2rem;
+    flex-direction: column;
+}
+
+.export-loading i {
+    font-size: 2.5rem;
+    margin-bottom: 0.75rem;
+    color: #3b82f6;
 }

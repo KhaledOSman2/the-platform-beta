@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken');
 const multer = require('multer');
 const xss = require('xss-clean'); // لتنظيف مدخلات المستخدم
 const app = express();
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 3000;
 
 // سر التوقيع للتوكن (يجب تغييره وتأمينه في بيئة الإنتاج)
 const JWT_SECRET = 'your_secret_key';
@@ -257,6 +257,11 @@ app.post('/api/users/:id/ban', authenticateToken, (req, res) => {
     if (!req.user.isAdmin) return res.sendStatus(403);
     let data = readData();
     const userId = parseInt(req.params.id);
+    // منع الأدمن من حظر حسابه الشخصي
+    if (req.user.id === userId) {
+        return res.status(403).json({ message: 'لا يمكن للمسؤول حظر حسابه الشخصي' });
+    }
+
     const user = data.users.find(user => user.id === userId);
     if (user) {
         user.isBanned = true;
@@ -737,6 +742,488 @@ app.get('/api/admin/dashboard', authenticateToken, (req, res) => {
     if (!req.user.isAdmin) return res.sendStatus(403);
     res.json({ message: 'لوحة تحكم الأدمن', user: req.user });
 });
+
+// ----------------------
+// API لإدارة أكواد التفعيل
+// ----------------------
+
+// جلب إحصائيات الاشتراكات
+app.get('/api/subscription-stats', authenticateToken, (req, res) => {
+    if (!req.user.isAdmin) return res.sendStatus(403);
+    
+    let data = readData();
+    
+    // حساب عدد الأكواد النشطة والمستخدمة
+    const activeCodes = data.activationCodes ? data.activationCodes.filter(code => !code.usedBy).length : 0;
+    const usedCodes = data.activationCodes ? data.activationCodes.filter(code => code.usedBy).length : 0;
+    
+    // حساب إجمالي عدد الاشتراكات الفعالة
+    const totalSubscriptions = data.subscriptions ? data.subscriptions.filter(sub => !sub.isExpired).length : 0;
+    
+    res.json({
+        activeCodes,
+        usedCodes,
+        totalSubscriptions
+    });
+});
+
+// جلب قائمة أكواد التفعيل مع دعم التصفية والصفحات
+app.get('/api/activation-codes', authenticateToken, (req, res) => {
+    if (!req.user.isAdmin) return res.sendStatus(403);
+    
+    const { page = 1, filter = 'all' } = req.query;
+    const pageSize = 10; // عدد العناصر في الصفحة الواحدة
+    
+    let data = readData();
+    
+    // إنشاء مصفوفة الأكواد إذا لم تكن موجودة
+    if (!data.activationCodes) {
+        data.activationCodes = [];
+    }
+    
+    // تصفية الأكواد حسب الحالة
+    let filteredCodes = [];
+    if (filter === 'all') {
+        filteredCodes = [...data.activationCodes];
+    } else if (filter === 'active') {
+        filteredCodes = data.activationCodes.filter(code => !code.usedBy && !code.isDisabled);
+    } else if (filter === 'used') {
+        filteredCodes = data.activationCodes.filter(code => code.usedBy);
+    } else if (filter === 'disabled') {
+        filteredCodes = data.activationCodes.filter(code => code.isDisabled);
+    }
+    
+    // ترتيب الأكواد (الأحدث أولاً)
+    filteredCodes.sort((a, b) => new Date(b.creationDate) - new Date(a.creationDate));
+    
+    // حساب إجمالي عدد الصفحات
+    const totalPages = Math.ceil(filteredCodes.length / pageSize);
+    
+    // تقسيم النتائج حسب الصفحة
+    const startIndex = (page - 1) * pageSize;
+    const paginatedCodes = filteredCodes.slice(startIndex, startIndex + pageSize);
+    
+    // تصنيف الأكواد إلى نشطة ومستخدمة ومعطلة للعرض
+    const activeCodes = paginatedCodes.filter(code => !code.usedBy && !code.isDisabled);
+    const usedCodes = paginatedCodes.filter(code => code.usedBy);
+    const disabledCodes = paginatedCodes.filter(code => code.isDisabled);
+    
+    res.json({
+        activeCodes,
+        usedCodes,
+        disabledCodes,
+        totalPages,
+        currentPage: parseInt(page),
+        totalItems: filteredCodes.length
+    });
+});
+
+// البحث في أكواد التفعيل
+app.get('/api/activation-codes/search', authenticateToken, (req, res) => {
+    if (!req.user.isAdmin) return res.sendStatus(403);
+    
+    const { term, filter = 'all' } = req.query;
+    if (!term) return res.status(400).json({ message: 'يرجى تحديد مصطلح البحث' });
+    
+    let data = readData();
+    
+    // إنشاء مصفوفة الأكواد إذا لم تكن موجودة
+    if (!data.activationCodes) {
+        data.activationCodes = [];
+        return res.json({ codes: [], totalPages: 0 });
+    }
+    
+    // تصفية أولية حسب الحالة
+    let filteredCodes = [];
+    if (filter === 'all') {
+        filteredCodes = [...data.activationCodes];
+    } else if (filter === 'active') {
+        filteredCodes = data.activationCodes.filter(code => !code.usedBy && !code.isDisabled);
+    } else if (filter === 'used') {
+        filteredCodes = data.activationCodes.filter(code => code.usedBy);
+    } else if (filter === 'disabled') {
+        filteredCodes = data.activationCodes.filter(code => code.isDisabled);
+    }
+    
+    // البحث عن المصطلح في الكود أو اسم المستخدم
+    const searchResults = filteredCodes.filter(code => {
+        return code.code.toLowerCase().includes(term.toLowerCase()) || 
+               (code.usedBy && code.usedBy.toLowerCase().includes(term.toLowerCase()));
+    });
+    
+    // ترتيب النتائج (الأحدث أولاً)
+    searchResults.sort((a, b) => new Date(b.creationDate) - new Date(a.creationDate));
+    
+    res.json({
+        codes: searchResults,
+        totalPages: Math.ceil(searchResults.length / 10)
+    });
+});
+
+// جلب تفاصيل كود تفعيل محدد
+app.get('/api/activation-codes/:id', authenticateToken, (req, res) => {
+    if (!req.user.isAdmin) return res.sendStatus(403);
+    
+    const codeId = parseInt(req.params.id);
+    
+    let data = readData();
+    
+    // البحث عن الكود بواسطة المعرف
+    const code = data.activationCodes ? data.activationCodes.find(c => c.id === codeId) : null;
+    
+    if (!code) {
+        return res.status(404).json({ message: 'الكود غير موجود' });
+    }
+    
+    // إضافة معلومات الكورسات
+    const courseDetails = [];
+    if (code.courseIds && Array.isArray(code.courseIds) && data.courses) {
+        code.courseIds.forEach(courseId => {
+            const course = data.courses.find(c => c.id === courseId);
+            if (course) {
+                courseDetails.push({
+                    id: course.id,
+                    title: course.title,
+                    grade: course.grade
+                });
+            }
+        });
+    }
+    
+    // إضافة معلومات الصف الدراسي
+    let gradeName = '';
+    if (code.gradeId && data.grades) {
+        const grade = data.grades.find(g => g.id === code.gradeId);
+        if (grade) {
+            gradeName = grade.name;
+        }
+    }
+    
+    // إنشاء كائن جديد يحتوي على جميع المعلومات
+    const codeDetails = {
+        ...code,
+        courses: courseDetails,
+        gradeName
+    };
+    
+    res.json(codeDetails);
+});
+
+// إنشاء أكواد تفعيل جديدة
+app.post('/api/activation-codes/generate', authenticateToken, (req, res) => {
+    if (!req.user.isAdmin) return res.sendStatus(403);
+    
+    const { count, gradeId, courseIds } = req.body;
+    
+    // التحقق من صحة البيانات
+    if (!count || count < 1 || count > 100) {
+        return res.status(400).json({ message: 'عدد الأكواد يجب أن يكون بين 1 و 100' });
+    }
+    
+    if (!gradeId) {
+        return res.status(400).json({ message: 'يرجى تحديد الصف الدراسي' });
+    }
+    
+    if (!courseIds || !Array.isArray(courseIds) || courseIds.length === 0) {
+        return res.status(400).json({ message: 'يرجى تحديد كورس واحد على الأقل' });
+    }
+    
+    let data = readData();
+    
+    // التحقق من وجود الصف والكورسات
+    const grade = data.grades ? data.grades.find(g => g.id === parseInt(gradeId)) : null;
+    if (!grade) {
+        return res.status(404).json({ message: 'الصف الدراسي غير موجود' });
+    }
+    
+    const courses = data.courses ? data.courses.filter(c => courseIds.includes(c.id)) : [];
+    if (courses.length === 0) {
+        return res.status(404).json({ message: 'الكورسات المحددة غير موجودة' });
+    }
+    
+    // إنشاء مصفوفة الأكواد إذا لم تكن موجودة
+    if (!data.activationCodes) {
+        data.activationCodes = [];
+    }
+    
+    // إنشاء الأكواد الجديدة
+    const newCodes = [];
+    for (let i = 0; i < count; i++) {
+        const newCode = {
+            id: Date.now() + i,
+            code: generateUniqueCode(data.activationCodes),
+            gradeId: parseInt(gradeId),
+            courseIds: courseIds.map(id => parseInt(id)),
+            creationDate: new Date().toISOString(),
+            createdBy: req.user.id
+        };
+        
+        newCodes.push(newCode);
+        data.activationCodes.push(newCode);
+    }
+    
+    // حفظ البيانات
+    writeData(data);
+    
+    res.json({
+        success: true,
+        message: `تم إنشاء ${count} كود بنجاح`,
+        codes: newCodes
+    });
+});
+
+// تعطيل كود تفعيل
+app.post('/api/activation-codes/:id/disable', authenticateToken, (req, res) => {
+    if (!req.user.isAdmin) return res.sendStatus(403);
+    
+    const codeId = parseInt(req.params.id);
+    
+    let data = readData();
+    
+    // البحث عن الكود بواسطة المعرف
+    if (!data.activationCodes) {
+        return res.status(404).json({ message: 'الكود غير موجود' });
+    }
+    
+    const codeIndex = data.activationCodes.findIndex(c => c.id === codeId);
+    
+    if (codeIndex === -1) {
+        return res.status(404).json({ message: 'الكود غير موجود' });
+    }
+    
+    // التحقق من أن الكود نشط وغير مستخدم
+    if (data.activationCodes[codeIndex].usedBy) {
+        return res.status(400).json({ message: 'الكود مستخدم بالفعل ولا يمكن تعطيله' });
+    }
+    
+    // تعطيل الكود عن طريق وضع علامة عليه
+    data.activationCodes[codeIndex].isDisabled = true;
+    data.activationCodes[codeIndex].disabledBy = req.user.id;
+    data.activationCodes[codeIndex].disabledDate = new Date().toISOString();
+    
+    // حفظ البيانات
+    writeData(data);
+    
+    res.json({
+        success: true,
+        message: 'تم تعطيل الكود بنجاح'
+    });
+});
+
+// إلغاء تعطيل كود تفعيل
+app.post('/api/activation-codes/:id/enable', authenticateToken, (req, res) => {
+    if (!req.user.isAdmin) return res.sendStatus(403);
+    
+    const codeId = parseInt(req.params.id);
+    
+    let data = readData();
+    
+    // البحث عن الكود بواسطة المعرف
+    if (!data.activationCodes) {
+        return res.status(404).json({ message: 'الكود غير موجود' });
+    }
+    
+    const codeIndex = data.activationCodes.findIndex(c => c.id === codeId);
+    
+    if (codeIndex === -1) {
+        return res.status(404).json({ message: 'الكود غير موجود' });
+    }
+    
+    // التحقق من أن الكود معطل
+    if (!data.activationCodes[codeIndex].isDisabled) {
+        return res.status(400).json({ message: 'الكود غير معطل' });
+    }
+    
+    // إلغاء تعطيل الكود
+    data.activationCodes[codeIndex].isDisabled = false;
+    data.activationCodes[codeIndex].enabledBy = req.user.id;
+    data.activationCodes[codeIndex].enabledDate = new Date().toISOString();
+    
+    // حفظ البيانات
+    writeData(data);
+    
+    res.json({
+        success: true,
+        message: 'تم إلغاء تعطيل الكود بنجاح'
+    });
+});
+
+// حذف كود تفعيل
+app.delete('/api/activation-codes/:id', authenticateToken, (req, res) => {
+    if (!req.user.isAdmin) return res.sendStatus(403);
+    
+    const codeId = parseInt(req.params.id);
+    
+    let data = readData();
+    
+    // البحث عن الكود بواسطة المعرف
+    if (!data.activationCodes) {
+        return res.status(404).json({ message: 'الكود غير موجود' });
+    }
+    
+    const codeIndex = data.activationCodes.findIndex(c => c.id === codeId);
+    
+    if (codeIndex === -1) {
+        return res.status(404).json({ message: 'الكود غير موجود' });
+    }
+    
+    // حذف الكود
+    data.activationCodes.splice(codeIndex, 1);
+    
+    // حفظ البيانات
+    writeData(data);
+    
+    res.json({
+        success: true,
+        message: 'تم حذف الكود بنجاح'
+    });
+});
+
+// تصدير الأكواد (نظام بسيط وآمن)
+app.get('/api/codes-export', (req, res) => {
+    const { filter = 'all' } = req.query;
+    
+    let data = readData();
+    
+    // إنشاء مصفوفة الأكواد إذا لم تكن موجودة
+    if (!data.activationCodes) {
+        data.activationCodes = [];
+        return res.status(200).send('لا توجد أكواد للتصدير');
+    }
+    
+    // تصفية الأكواد حسب الحالة
+    let filteredCodes = [];
+    if (filter === 'all') {
+        filteredCodes = [...data.activationCodes];
+    } else if (filter === 'active') {
+        filteredCodes = data.activationCodes.filter(code => !code.usedBy && !code.isDisabled);
+    } else if (filter === 'used') {
+        filteredCodes = data.activationCodes.filter(code => code.usedBy);
+    } else if (filter === 'disabled') {
+        filteredCodes = data.activationCodes.filter(code => code.isDisabled);
+    }
+    
+    if (filteredCodes.length === 0) {
+        return res.status(200).send('لا توجد أكواد تطابق معايير التصفية المحددة');
+    }
+    
+    // إعداد البيانات للتصدير بتنسيق CSV
+    let csvContent = 'كود التفعيل,تاريخ الإنشاء,الحالة,المستخدم,تاريخ الاستخدام\n';
+    
+    filteredCodes.forEach(code => {
+        let status = code.isDisabled ? 'معطل' : (code.usedBy ? 'مستخدم' : 'نشط');
+        csvContent += `${code.code},${new Date(code.creationDate).toLocaleDateString('ar-EG')},${status},${code.usedBy || '-'},${code.usageDate ? new Date(code.usageDate).toLocaleDateString('ar-EG') : '-'}\n`;
+    });
+    
+    // تحديد اسم الملف بالإنجليزية
+    let fileName = 'activation-codes';
+    if (filter === 'active') fileName = 'active-codes';
+    if (filter === 'used') fileName = 'used-codes';
+    if (filter === 'disabled') fileName = 'disabled-codes';
+    
+    // إضافة التاريخ إلى اسم الملف
+    const date = new Date().toISOString().split('T')[0];
+    fileName = `${fileName}-${date}.csv`;
+    
+    // إرسال الملف للتحميل
+    res.setHeader('Content-Type', 'text/csv; charset=utf-8');
+    res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
+    res.status(200).send(csvContent);
+});
+
+
+// استخدام كود تفعيل (عملية تسجيل المستخدم للكود)
+app.post('/api/activation-codes/activate', authenticateToken, (req, res) => {
+    const { code } = req.body;
+    
+    if (!code) {
+        return res.status(400).json({ message: 'يرجى إدخال كود التفعيل' });
+    }
+    
+    let data = readData();
+    
+    // البحث عن الكود
+    if (!data.activationCodes) {
+        return res.status(404).json({ message: 'الكود غير صحيح' });
+    }
+    
+    const codeIndex = data.activationCodes.findIndex(c => c.code === code);
+    
+    if (codeIndex === -1) {
+        return res.status(404).json({ message: 'الكود غير صحيح' });
+    }
+    
+    const activationCode = data.activationCodes[codeIndex];
+    
+    // التحقق من أن الكود غير مستخدم ولم يتم تعطيله
+    if (activationCode.usedBy) {
+        return res.status(400).json({ message: 'هذا الكود مستخدم بالفعل' });
+    }
+    
+    if (activationCode.isDisabled) {
+        return res.status(400).json({ message: 'هذا الكود غير صالح للاستخدام' });
+    }
+    
+    // تحديث الكود بمعلومات المستخدم
+    activationCode.usedBy = req.user.id;
+    activationCode.usageDate = new Date().toISOString();
+    
+    // إنشاء اشتراك جديد للمستخدم
+    if (!data.subscriptions) {
+        data.subscriptions = [];
+    }
+    
+    // التحقق من وجود اشتراكات سابقة للكورسات نفسها
+    const userSubscriptions = data.subscriptions.filter(sub => 
+        sub.userId === req.user.id && 
+        activationCode.courseIds.some(courseId => sub.courseIds.includes(courseId))
+    );
+    
+    // إضافة الاشتراك الجديد
+    data.subscriptions.push({
+        id: Date.now(),
+        userId: req.user.id,
+        courseIds: activationCode.courseIds,
+        gradeId: activationCode.gradeId,
+        activationCodeId: activationCode.id,
+        startDate: new Date().toISOString(),
+        isExpired: false
+    });
+    
+    // حفظ البيانات
+    writeData(data);
+    
+    // جلب معلومات الكورسات التي تم الاشتراك فيها
+    const subscribedCourses = activationCode.courseIds.map(courseId => {
+        const course = data.courses.find(c => c.id === courseId);
+        return course ? { id: course.id, title: course.title } : null;
+    }).filter(Boolean);
+    
+    res.json({
+        success: true,
+        message: 'تم تفعيل الكود بنجاح',
+        subscribedCourses
+    });
+});
+
+// دالة لإنشاء كود تفعيل فريد
+function generateUniqueCode(existingCodes = []) {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // استبعاد الأحرف المتشابهة
+    let code;
+    let isUnique = false;
+    
+    // استمر في توليد أكواد حتى تجد كودًا فريدًا
+    while (!isUnique) {
+        // إنشاء كود بتنسيق XXXXXX
+        code = Array.from({ length: 6 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+        
+        
+        // التحقق من أن الكود غير موجود بالفعل
+        isUnique = !existingCodes.some(existingCode => existingCode.code === code);
+    }
+    
+    return code;
+}
 
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);

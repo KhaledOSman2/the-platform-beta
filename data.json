@@ -246,7 +246,7 @@
     },
     {
       "id": 1743346705551,
-      "title": "الباب الثاني : الكيمياء التحليلية الصف الثالث الثانوي1",
+      "title": "الباب الثاني : الكيمياء التحليلية الصف الثالث الثانوي",
       "videoURL": "https://www.youtube.com/embed/7zR_ynfzXQQ?si=GbTb0u5cze0SRvtZ",
       "videos": [],
       "activities": [],
@@ -289,5 +289,37 @@
       "grade": "عام"
     }
   ],
-  "activationCodes": []
+  "activationCodes": [
+    {
+      "id": 1744467696352,
+      "code": "2UAZS2",
+      "gradeId": 1738789210737,
+      "courseIds": [
+        1743346705551,
+        1743320238580
+      ],
+      "creationDate": "2025-04-12T14:21:36.352Z",
+      "createdBy": 1738562296250,
+      "isDisabled": false,
+      "disabledBy": 1738562296250,
+      "disabledDate": "2025-04-12T15:17:37.523Z",
+      "enabledBy": 1738562296250,
+      "enabledDate": "2025-04-12T15:17:38.900Z"
+    },
+    {
+      "id": 1744468768919,
+      "code": "PAU82V",
+      "gradeId": 1738789210737,
+      "courseIds": [
+        1743320238580
+      ],
+      "creationDate": "2025-04-12T14:39:28.920Z",
+      "createdBy": 1738562296250,
+      "isDisabled": false,
+      "disabledBy": 1738562296250,
+      "disabledDate": "2025-04-12T15:16:44.643Z",
+      "enabledBy": 1738562296250,
+      "enabledDate": "2025-04-12T15:16:46.769Z"
+    }
+  ]
 }

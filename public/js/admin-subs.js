@@ -1,79 +1,209 @@
+// Immediate check before any DOM operations
+(function () {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.replace('login.html?from=admin');
+    }
+})();
+
+
+document.addEventListener('DOMContentLoaded', function () {
+    const token = localStorage.getItem('token');
+    if (!token) {
+        window.location.href = 'login.html?from=admin';
+        return;
+    }
+    
 // Global variables
 let activeCodes = [];
 let usedCodes = [];
+let disabledCodes = [];
 let currentFilter = 'all';
 let codesPage = 1;
 const codesPerPage = 10;
+let grades = [];
+let availableCourses = [];
+let selectedCourses = [];
+let selectAllActive = false;
 
 // When the document is ready
-document.addEventListener('DOMContentLoaded', function () {
+
     // Initial data loading
     loadStatistics();
     loadCodes();
+    loadGrades();
     setupEventListeners();
-});
+
+// Load grades for dropdown
+function loadGrades() {
+    fetch('/api/grades', {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    })
+    .then(response => response.json())
+    .then(data => {
+        grades = data;
+        populateGradesDropdown();
+    })
+    .catch(error => {
+        console.error('Error loading grades:', error);
+    });
+}
+
+// Populate grades dropdown
+function populateGradesDropdown() {
+    const gradeSelect = document.getElementById('codeGrade');
+    gradeSelect.innerHTML = '<option value="">اختر الصف الدراسي</option>';
+    
+    grades.forEach(grade => {
+        const option = document.createElement('option');
+        option.value = grade.id;
+        option.textContent = grade.name;
+        gradeSelect.appendChild(option);
+    });
+}
+
+// Load courses by grade
+function loadCoursesByGrade(gradeId) {
+    // Show loading state
+    const coursesLoading = document.querySelector('.courses-loading');
+    const coursesEmpty = document.querySelector('.courses-empty');
+    const coursesList = document.getElementById('coursesList');
+    
+    coursesLoading.classList.remove('d-none');
+    coursesEmpty.classList.add('d-none');
+    coursesList.classList.add('d-none');
+    coursesList.innerHTML = '';
+    
+    // Reset selected courses
+    selectedCourses = [];
+    selectAllActive = false;
+    updateToggleAllButtonText();
+    
+    fetch(`/api/admin-courses?grade=${gradeId}`, {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    })
+    .then(response => response.json())
+    .then(data => {
+        availableCourses = data;
+        populateCoursesList();
+        coursesLoading.classList.add('d-none');
+        
+        if (availableCourses.length === 0) {
+            coursesEmpty.querySelector('p').textContent = 'لا توجد كورسات متاحة لهذا الصف الدراسي.';
+            coursesEmpty.classList.remove('d-none');
+        } else {
+            coursesList.classList.remove('d-none');
+        }
+    })
+    .catch(error => {
+        console.error('Error loading courses:', error);
+    });
+}
+
+// Populate courses list with checkboxes
+function populateCoursesList() {
+    const coursesList = document.getElementById('coursesList');
+    coursesList.innerHTML = '';
+    
+    availableCourses.forEach(course => {
+        const courseItem = document.createElement('div');
+        courseItem.className = 'course-item';
+        courseItem.dataset.courseId = course.id;
+        courseItem.innerHTML = `
+            <label>
+                <input type="checkbox" class="course-checkbox" value="${course.id}">
+                <span class="course-title">${course.title}</span>
+            </label>
+        `;
+        coursesList.appendChild(courseItem);
+        
+        // Add event listener to checkbox
+        const checkbox = courseItem.querySelector('input[type="checkbox"]');
+        checkbox.addEventListener('change', function() {
+            const courseId = parseInt(this.value);
+            if (this.checked) {
+                selectedCourses.push(courseId);
+                courseItem.classList.add('selected');
+            } else {
+                selectedCourses = selectedCourses.filter(id => id !== courseId);
+                courseItem.classList.remove('selected');
+                // Update toggle all button state if any is unchecked
+                if (selectAllActive) {
+                    selectAllActive = false;
+                    updateToggleAllButtonText();
+                }
+            }
+        });
+    });
+}
+
+// Toggle all courses selection
+function toggleAllCourses() {
+    selectAllActive = !selectAllActive;
+    updateToggleAllButtonText();
+    
+    const checkboxes = document.querySelectorAll('.course-checkbox');
+    const courseItems = document.querySelectorAll('.course-item');
+    
+    checkboxes.forEach((checkbox, index) => {
+        checkbox.checked = selectAllActive;
+        if (selectAllActive) {
+            courseItems[index].classList.add('selected');
+        } else {
+            courseItems[index].classList.remove('selected');
+        }
+    });
+    
+    // Update selectedCourses array
+    if (selectAllActive) {
+        selectedCourses = availableCourses.map(course => course.id);
+    } else {
+        selectedCourses = [];
+    }
+}
+
+// Update toggle all button text
+function updateToggleAllButtonText() {
+    const toggleBtn = document.getElementById('toggleAllCourses');
+    if (selectAllActive) {
+        toggleBtn.innerHTML = '<i class="fas fa-square me-1"></i> إلغاء تحديد الكل';
+    } else {
+        toggleBtn.innerHTML = '<i class="fas fa-check-square me-1"></i> تحديد الكل';
+    }
+}
 
 // Load statistics for dashboard
 function loadStatistics() {
-    // This would normally be an API call
-    // For now we'll just set dummy statistics
-    document.getElementById('totalActiveCodes').textContent = '0';
-    document.getElementById('totalUsedCodes').textContent = '0';
-    document.getElementById('totalSubscriptions').textContent = '0';
-
-    // API call would be something like:
-    // fetch('/api/subscription-stats', {
-    //     method: 'GET',
-    //     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-    // })
-    // .then(response => response.json())
-    // .then(data => {
-    //     document.getElementById('totalActiveCodes').textContent = data.activeCodes;
-    //     document.getElementById('totalUsedCodes').textContent = data.usedCodes;
-    //     document.getElementById('totalSubscriptions').textContent = data.totalSubscriptions;
-    // })
-    // .catch(error => console.error('Error loading statistics:', error));
+    fetch('/api/subscription-stats', {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('totalActiveCodes').textContent = data.activeCodes;
+        document.getElementById('totalUsedCodes').textContent = data.usedCodes;
+        document.getElementById('totalSubscriptions').textContent = data.totalSubscriptions;
+    })
+    .catch(error => console.error('Error loading statistics:', error));
 }
 
 // Load activation codes
 function loadCodes(page = 1) {
-    // This would normally be an API call to get codes from the server
-    // For now, we'll just set up the structure
-
-    // API call would be something like:
-    // fetch(`/api/activation-codes?page=${page}&filter=${currentFilter}`, {
-    //     method: 'GET',
-    //     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-    // })
-    // .then(response => response.json())
-    // .then(data => {
-    //     activeCodes = data.activeCodes;
-    //     usedCodes = data.usedCodes;
-    //     displayCodes();
-    //     updateCodesPagination(data.totalPages, page);
-    // })
-    // .catch(error => console.error('Error loading codes:', error));
-
-    // For now, we'll just update the UI to show it's ready for data
-    const codesTable = document.getElementById('codesTable');
-    const tbody = codesTable.querySelector('tbody');
-
-    // Clear existing rows
-    tbody.innerHTML = '';
-
-    // Add a placeholder row
-    const row = document.createElement('tr');
-    row.innerHTML = `
-        <td colspan="9" class="text-center">
-            <div class="alert alert-info m-0">
-                لا توجد أكواد للعرض حالياً. قم بإنشاء أكواد جديدة باستخدام زر "إنشاء أكواد".
-            </div>
-        </td>
-    `;
-    tbody.appendChild(row);
-
-    // Update pagination
-    updateCodesPagination(1, 1);
+    fetch(`/api/activation-codes?page=${page}&filter=${currentFilter}`, {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    })
+    .then(response => response.json())
+    .then(data => {
+        activeCodes = data.activeCodes;
+        usedCodes = data.usedCodes;
+        disabledCodes = data.disabledCodes || [];
+        displayCodes();
+        updateCodesPagination(data.totalPages, page);
+    })
+    .catch(error => console.error('Error loading codes:', error));
 }
 
 // Display codes based on current filter
@@ -87,11 +217,13 @@ function displayCodes() {
     // Determine which codes to display based on filter
     let codesToDisplay = [];
     if (currentFilter === 'all') {
-        codesToDisplay = [...activeCodes, ...usedCodes];
+        codesToDisplay = [...activeCodes, ...usedCodes, ...disabledCodes];
     } else if (currentFilter === 'active') {
         codesToDisplay = [...activeCodes];
     } else if (currentFilter === 'used') {
         codesToDisplay = [...usedCodes];
+    } else if (currentFilter === 'disabled') {
+        codesToDisplay = [...disabledCodes];
     }
 
     // Calculate pagination
@@ -116,16 +248,17 @@ function displayCodes() {
     // Add rows for each code
     paginatedCodes.forEach((code, index) => {
         const row = document.createElement('tr');
-        const isActive = !code.usedBy;
-        const statusClass = isActive ? 'success' : 'secondary';
-        const statusText = isActive ? 'نشط' : 'مستخدم';
+        
+        // تحديد حالة الكود
+        let isActive = !code.usedBy && !code.isDisabled;
+        let isDisabled = code.isDisabled === true;
+        let statusClass = isActive ? 'success' : (isDisabled ? 'warning' : 'secondary');
+        let statusText = isActive ? 'نشط' : (isDisabled ? 'معطل' : 'مستخدم');
 
         row.innerHTML = `
             <td>${startIndex + index + 1}</td>
             <td>${code.code}</td>
-            <td>${getSubscriptionTypeName(code.subscriptionType)}</td>
             <td>${formatDate(code.creationDate)}</td>
-            <td>${formatDate(code.expiryDate)}</td>
             <td><span class="badge bg-${statusClass}">${statusText}</span></td>
             <td>${code.usedBy || '-'}</td>
             <td>${code.usageDate ? formatDate(code.usageDate) : '-'}</td>
@@ -136,6 +269,11 @@ function displayCodes() {
                 ${isActive ? `
                 <button class="btn btn-sm btn-warning disable-code" data-code-id="${code.id}" title="تعطيل الكود">
                     <i class="fas fa-ban"></i>
+                </button>
+                ` : ''}
+                ${isDisabled ? `
+                <button class="btn btn-sm btn-success enable-code" data-code-id="${code.id}" title="إلغاء تعطيل الكود">
+                    <i class="fas fa-check"></i>
                 </button>
                 ` : ''}
                 <button class="btn btn-sm btn-danger delete-code" data-code-id="${code.id}" title="حذف الكود">
@@ -218,42 +356,88 @@ function searchCodes(searchTerm) {
         return;
     }
 
-    // This would normally be an API call with search parameter
-    // For now, just simulate empty results
+    fetch(`/api/activation-codes/search?term=${encodeURIComponent(searchTerm)}&filter=${currentFilter}`, {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Update the table with search results
+        displaySearchResults(data.codes);
+        updateCodesPagination(data.totalPages, 1);
+    })
+    .catch(error => console.error('Error searching codes:', error));
+}
+
+// Display search results
+function displaySearchResults(codes) {
     const codesTable = document.getElementById('codesTable');
     const tbody = codesTable.querySelector('tbody');
 
-    tbody.innerHTML = `
-        <tr>
+    // Clear existing rows
+    tbody.innerHTML = '';
+
+    // If no codes, show a message
+    if (!codes || codes.length === 0) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
             <td colspan="9" class="text-center">
                 <div class="alert alert-info m-0">
-                    جاري البحث عن "${searchTerm}"...
+                    لا توجد نتائج تطابق البحث.
                 </div>
             </td>
-        </tr>
-    `;
+        `;
+        tbody.appendChild(row);
+        return;
+    }
 
-    // In a real implementation, you would do:
-    // fetch(`/api/activation-codes/search?term=${encodeURIComponent(searchTerm)}&filter=${currentFilter}`, {
-    //     method: 'GET',
-    //     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-    // })
-    // .then(response => response.json())
-    // .then(data => {
-    //     // Update the table with search results
-    //     displaySearchResults(data.codes);
-    //     updateCodesPagination(data.totalPages, 1);
-    // })
-    // .catch(error => console.error('Error searching codes:', error));
+    // Add rows for each code in search results
+    codes.forEach((code, index) => {
+        const row = document.createElement('tr');
+        
+        // تحديد حالة الكود
+        let isActive = !code.usedBy && !code.isDisabled;
+        let isDisabled = code.isDisabled === true;
+        let statusClass = isActive ? 'success' : (isDisabled ? 'warning' : 'secondary');
+        let statusText = isActive ? 'نشط' : (isDisabled ? 'معطل' : 'مستخدم');
+
+        row.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${code.code}</td>
+            <td>${formatDate(code.creationDate)}</td>
+            <td><span class="badge bg-${statusClass}">${statusText}</span></td>
+            <td>${code.usedBy || '-'}</td>
+            <td>${code.usageDate ? formatDate(code.usageDate) : '-'}</td>
+            <td>
+                <button class="btn btn-sm btn-primary view-code" data-code-id="${code.id}" title="عرض التفاصيل">
+                    <i class="fas fa-eye"></i>
+                </button>
+                ${isActive ? `
+                <button class="btn btn-sm btn-warning disable-code" data-code-id="${code.id}" title="تعطيل الكود">
+                    <i class="fas fa-ban"></i>
+                </button>
+                ` : ''}
+                ${isDisabled ? `
+                <button class="btn btn-sm btn-success enable-code" data-code-id="${code.id}" title="إلغاء تعطيل الكود">
+                    <i class="fas fa-check"></i>
+                </button>
+                ` : ''}
+                <button class="btn btn-sm btn-danger delete-code" data-code-id="${code.id}" title="حذف الكود">
+                    <i class="fas fa-trash"></i>
+                </button>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+
+    // Attach event listeners to buttons
+    attachCodeActionListeners();
 }
 
 // Generate new activation codes
 function generateCodes() {
     const count = document.getElementById('codeCount').value;
-    const subscriptionType = document.getElementById('subscriptionType').value;
-    const expiryDate = document.getElementById('expiryDate').value;
-    const prefix = document.getElementById('codePrefix').value || '';
-    const notes = document.getElementById('notes').value || '';
+    const gradeId = document.getElementById('codeGrade').value;
 
     // Validate inputs
     if (!count || count < 1 || count > 100) {
@@ -261,62 +445,87 @@ function generateCodes() {
         return;
     }
 
-    // In a real implementation, you would send this data to your server:
-    // fetch('/api/activation-codes/generate', {
-    //     method: 'POST',
-    //     headers: {
-    //         'Content-Type': 'application/json',
-    //         'Authorization': `Bearer ${localStorage.getItem('token')}`
-    //     },
-    //     body: JSON.stringify({
-    //         count,
-    //         subscriptionType,
-    //         expiryDate,
-    //         prefix,
-    //         notes
-    //     })
-    // })
-    // .then(response => response.json())
-    // .then(data => {
-    //     if (data.success) {
-    //         // Hide modal
-    //         const modal = bootstrap.Modal.getInstance(document.getElementById('createCodesModal'));
-    //         modal.hide();
-    //
-    //         // Reload codes
-    //         loadCodes(1);
-    //         loadStatistics();
-    //
-    //         // Show success message
-    //         alert(`تم إنشاء ${count} كود بنجاح!`);
-    //     } else {
-    //         alert('حدث خطأ أثناء إنشاء الأكواد: ' + data.message);
-    //     }
-    // })
-    // .catch(error => {
-    //     console.error('Error generating codes:', error);
-    //     alert('حدث خطأ أثناء إنشاء الأكواد.');
-    // });
+    if (!gradeId) {
+        alert('يرجى اختيار الصف الدراسي.');
+        return;
+    }
+    
+    if (selectedCourses.length === 0) {
+        alert('يرجى اختيار كورس واحد على الأقل.');
+        return;
+    }
 
-    // For demo purposes, just show a success message
+    fetch('/api/activation-codes/generate', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+            count,
+            gradeId,
+            courseIds: selectedCourses
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Hide modal
     const modal = bootstrap.Modal.getInstance(document.getElementById('createCodesModal'));
     modal.hide();
 
-    // Show success message
-    alert(`تم طلب إنشاء ${count} كود بنجاح!`);
+            // Reload codes
+            loadCodes(1);
+            loadStatistics();
 
-    // Reset form
-    document.getElementById('createCodesForm').reset();
+    // Show success message
+            alert(`تم إنشاء ${count} كود بنجاح!`);
+        } else {
+            alert('حدث خطأ أثناء إنشاء الأكواد: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error generating codes:', error);
+        alert('حدث خطأ أثناء إنشاء الأكواد.');
+    });
 }
 
 // Export codes to Excel/CSV
 function exportCodes(filter) {
-    // This would normally be an API call to generate and download an export file
-    // For now, just alert the user
-    alert(`سيتم تصدير الأكواد (${filter}) قريباً...`);
-
-    // In a real implementation:
-    // window.location.href = `/api/activation-codes/export?filter=${filter}&token=${localStorage.getItem('token')}`;
+    // إظهار مؤشر التحميل
+    document.body.style.cursor = 'wait';
+    const exportBtn = document.querySelector(`button[onclick="exportCodes('${filter}')"]`);
+    if (exportBtn) {
+        exportBtn.disabled = true;
+        exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التصدير...';
+    }
+    
+    // استخدام iframe مخفي للتنزيل
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = `/api/codes-export?filter=${filter}`;
+    document.body.appendChild(iframe);
+    
+    // إعادة الزر إلى حالته الطبيعية بعد ثانيتين
+    setTimeout(() => {
+        document.body.style.cursor = 'default';
+        if (exportBtn) {
+            exportBtn.disabled = false;
+            
+            // إعادة النص الأصلي للزر
+            let btnText = 'تصدير جميع الأكواد';
+            if (filter === 'active') btnText = 'تصدير الأكواد النشطة';
+            if (filter === 'used') btnText = 'تصدير الأكواد المستخدمة';
+            if (filter === 'disabled') btnText = 'تصدير الأكواد المعطلة';
+            
+            exportBtn.innerHTML = `<i class="fas fa-file-export me-1"></i> ${btnText}`;
+        }
+        
+        // إزالة الإطار بعد التنزيل
+        setTimeout(() => {
+            document.body.removeChild(iframe);
+        }, 1000);
+    }, 2000);
 }
 
 // Helper function to format dates
@@ -326,18 +535,33 @@ function formatDate(dateString) {
     return date.toLocaleDateString('ar-EG');
 }
 
-// Helper function to get subscription type name
-function getSubscriptionTypeName(type) {
-    const types = {
-        'basic': 'أساسي',
-        'standard': 'قياسي',
-        'premium': 'متميز'
-    };
-    return types[type] || type;
-}
-
 // Set up event listeners
 function setupEventListeners() {
+    // Grade selection change
+    const gradeSelect = document.getElementById('codeGrade');
+    if (gradeSelect) {
+        gradeSelect.addEventListener('change', function() {
+            const gradeId = this.value;
+            if (gradeId) {
+                loadCoursesByGrade(gradeId);
+            } else {
+                // Reset courses display when no grade is selected
+                document.querySelector('.courses-empty').classList.remove('d-none');
+                document.querySelector('.courses-empty').querySelector('p').textContent = 
+                    'يرجى اختيار الصف الدراسي أولاً لعرض الكورسات المتاحة.';
+                document.getElementById('coursesList').classList.add('d-none');
+                document.querySelector('.courses-loading').classList.add('d-none');
+                selectedCourses = [];
+            }
+        });
+    }
+    
+    // Toggle all courses button
+    const toggleAllBtn = document.getElementById('toggleAllCourses');
+    if (toggleAllBtn) {
+        toggleAllBtn.addEventListener('click', toggleAllCourses);
+    }
+
     // Code search
     const searchInput = document.getElementById('codeSearchInput');
     if (searchInput) {
@@ -363,10 +587,18 @@ function setupEventListeners() {
     document.getElementById('exportAllCodes').addEventListener('click', () => exportCodes('all'));
     document.getElementById('exportActiveCodes').addEventListener('click', () => exportCodes('active'));
     document.getElementById('exportUsedCodes').addEventListener('click', () => exportCodes('used'));
+    document.getElementById('exportDisabledCodes').addEventListener('click', () => exportCodes('disabled'));
 
     // Reset form when modal is closed
     document.getElementById('createCodesModal').addEventListener('hidden.bs.modal', function () {
         document.getElementById('createCodesForm').reset();
+        document.getElementById('coursesList').innerHTML = '';
+        document.querySelector('.courses-empty').classList.remove('d-none');
+        document.getElementById('coursesList').classList.add('d-none');
+        document.querySelector('.courses-loading').classList.add('d-none');
+        selectedCourses = [];
+        selectAllActive = false;
+        updateToggleAllButtonText();
     });
 }
 
@@ -390,6 +622,16 @@ function attachCodeActionListeners() {
         });
     });
 
+    // Enable code (إلغاء تعطيل الكود)
+    document.querySelectorAll('.enable-code').forEach(btn => {
+        btn.addEventListener('click', function () {
+            const codeId = this.dataset.codeId;
+            if (confirm('هل أنت متأكد من رغبتك في إلغاء تعطيل هذا الكود؟')) {
+                enableCode(codeId);
+            }
+        });
+    });
+
     // Delete code
     document.querySelectorAll('.delete-code').forEach(btn => {
         btn.addEventListener('click', function () {
@@ -403,96 +645,127 @@ function attachCodeActionListeners() {
 
 // View code details
 function viewCodeDetails(codeId) {
-    // In a real implementation, you would fetch details from the server:
-    // fetch(`/api/activation-codes/${codeId}`, {
-    //     method: 'GET',
-    //     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-    // })
-    // .then(response => response.json())
-    // .then(code => {
-    //     // Populate the modal with code details
-    //     document.getElementById('viewCodeValue').textContent = code.code;
-    //     document.getElementById('viewSubscriptionType').textContent = getSubscriptionTypeName(code.subscriptionType);
-    //     document.getElementById('viewCreationDate').textContent = formatDate(code.creationDate);
-    //     document.getElementById('viewExpiryDate').textContent = formatDate(code.expiryDate);
-    //     document.getElementById('viewStatus').textContent = code.usedBy ? 'مستخدم' : 'نشط';
-    //     document.getElementById('viewUser').textContent = code.usedBy || '-';
-    //     document.getElementById('viewUsageDate').textContent = code.usageDate ? formatDate(code.usageDate) : '-';
-    //     document.getElementById('viewNotes').textContent = code.notes || '-';
-    //
-    //     // Show the modal
-    //     const modal = new bootstrap.Modal(document.getElementById('codeDetailsModal'));
-    //     modal.show();
-    // })
-    // .catch(error => console.error('Error getting code details:', error));
-
-    // For demo purposes, show modal with placeholder data
-    document.getElementById('viewCodeValue').textContent = 'ABC-123456';
-    document.getElementById('viewSubscriptionType').textContent = 'أساسي';
-    document.getElementById('viewCreationDate').textContent = formatDate(new Date());
-    document.getElementById('viewExpiryDate').textContent = formatDate(new Date(Date.now() + 30 * 24 * 60 * 60 * 1000));
-    document.getElementById('viewStatus').textContent = 'نشط';
-    document.getElementById('viewUser').textContent = '-';
-    document.getElementById('viewUsageDate').textContent = '-';
-    document.getElementById('viewNotes').textContent = '-';
+    fetch(`/api/activation-codes/${codeId}`, {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    })
+    .then(response => response.json())
+    .then(code => {
+        // Populate the modal with code details
+        document.getElementById('viewCodeValue').textContent = code.code;
+        document.getElementById('viewCreationDate').textContent = formatDate(code.creationDate);
+        
+        // تحديد حالة الكود (نشط أو معطل أو مستخدم)
+        let status = 'نشط';
+        if (code.isDisabled) {
+            status = 'معطل';
+        } else if (code.usedBy) {
+            status = 'مستخدم';
+        }
+        document.getElementById('viewStatus').textContent = status;
+        
+        document.getElementById('viewUser').textContent = code.usedBy || '-';
+        document.getElementById('viewUsageDate').textContent = code.usageDate ? formatDate(code.usageDate) : '-';
+        
+        // عرض معلومات الصف الدراسي
+        const gradeElement = document.getElementById('viewGrade');
+        if (gradeElement) {
+            gradeElement.textContent = code.gradeName || '-';
+        }
+        
+        // عرض معلومات الكورسات كـ badges
+        const coursesListElement = document.getElementById('viewCoursesList');
+        if (coursesListElement) {
+            coursesListElement.innerHTML = ''; // Clear previous badges
+            if (code.courses && Array.isArray(code.courses) && code.courses.length > 0) {
+                code.courses.forEach(course => {
+                    const badge = document.createElement('span');
+                    badge.className = 'course-badge';
+                    badge.textContent = course.title;
+                    coursesListElement.appendChild(badge);
+                });
+            } else {
+                coursesListElement.textContent = '-';
+            }
+        }
 
     // Show the modal
     const modal = new bootstrap.Modal(document.getElementById('codeDetailsModal'));
     modal.show();
+    })
+    .catch(error => {
+        console.error('Error getting code details:', error);
+        alert('حدث خطأ أثناء جلب تفاصيل الكود');
+    });
 }
 
 // Disable a code
 function disableCode(codeId) {
-    // This would be an API call in a real implementation
-    // fetch(`/api/activation-codes/${codeId}/disable`, {
-    //     method: 'POST',
-    //     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-    // })
-    // .then(response => response.json())
-    // .then(data => {
-    //     if (data.success) {
-    //         // Reload codes
-    //         loadCodes(codesPage);
-    //         loadStatistics();
-    //         alert('تم تعطيل الكود بنجاح.');
-    //     } else {
-    //         alert('حدث خطأ أثناء تعطيل الكود: ' + data.message);
-    //     }
-    // })
-    // .catch(error => {
-    //     console.error('Error disabling code:', error);
-    //     alert('حدث خطأ أثناء تعطيل الكود.');
-    // });
-
-    // For demo purposes, just show a message
+    fetch(`/api/activation-codes/${codeId}/disable`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Reload codes
+            loadCodes(codesPage);
+            loadStatistics();
     alert('تم تعطيل الكود بنجاح.');
+        } else {
+            alert('حدث خطأ أثناء تعطيل الكود: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error disabling code:', error);
+        alert('حدث خطأ أثناء تعطيل الكود.');
+    });
+}
+
+// Enable a code (إلغاء تعطيل كود)
+function enableCode(codeId) {
+    fetch(`/api/activation-codes/${codeId}/enable`, {
+        method: 'POST',
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Reload codes
+            loadCodes(codesPage);
+            loadStatistics();
+            alert('تم إلغاء تعطيل الكود بنجاح.');
+        } else {
+            alert('حدث خطأ أثناء إلغاء تعطيل الكود: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error enabling code:', error);
+        alert('حدث خطأ أثناء إلغاء تعطيل الكود.');
+    });
 }
 
 // Delete a code
 function deleteCode(codeId) {
-    // This would be an API call in a real implementation
-    // fetch(`/api/activation-codes/${codeId}`, {
-    //     method: 'DELETE',
-    //     headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
-    // })
-    // .then(response => response.json())
-    // .then(data => {
-    //     if (data.success) {
-    //         // Reload codes
-    //         loadCodes(codesPage);
-    //         loadStatistics();
-    //         alert('تم حذف الكود بنجاح.');
-    //     } else {
-    //         alert('حدث خطأ أثناء حذف الكود: ' + data.message);
-    //     }
-    // })
-    // .catch(error => {
-    //     console.error('Error deleting code:', error);
-    //     alert('حدث خطأ أثناء حذف الكود.');
-    // });
-
-    // For demo purposes, just show a message
+    fetch(`/api/activation-codes/${codeId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Reload codes
+            loadCodes(codesPage);
+            loadStatistics();
     alert('تم حذف الكود بنجاح.');
+        } else {
+            alert('حدث خطأ أثناء حذف الكود: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error deleting code:', error);
+        alert('حدث خطأ أثناء حذف الكود.');
+    });
 }
 
 // Utility function for debouncing
@@ -504,4 +777,6 @@ function debounce(func, delay) {
         clearTimeout(timeout);
         timeout = setTimeout(() => func.apply(context, args), delay);
     };
-}
+    }
+
+});
