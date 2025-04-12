@@ -330,6 +330,27 @@ app.get('/api/admin-courses', authenticateToken, (req, res) => {
     res.json(data.courses);
 });
 
+// جلب جميع الكورسات لغرض الفلترة
+app.get('/api/admin-all-courses', authenticateToken, (req, res) => {
+    if (!req.user.isAdmin) return res.sendStatus(403);
+    
+    let data = readData();
+    
+    // التحقق من وجود مصفوفة الكورسات
+    if (!data.courses) {
+        data.courses = [];
+    }
+    
+    // استخراج معلومات الكورسات المطلوبة فقط
+    const courses = data.courses.map(course => ({
+        id: course.id,
+        title: course.title,
+        grade: course.grade
+    }));
+    
+    res.json(courses);
+});
+
 app.get('/api/courses/:id', authenticateToken, (req, res) => {
     let data = readData();
     const courseId = parseInt(req.params.id);
@@ -771,7 +792,7 @@ app.get('/api/subscription-stats', authenticateToken, (req, res) => {
 app.get('/api/activation-codes', authenticateToken, (req, res) => {
     if (!req.user.isAdmin) return res.sendStatus(403);
     
-    const { page = 1, filter = 'all' } = req.query;
+    const { page = 1, filter = 'all', grade = '', course = '' } = req.query;
     const pageSize = 10; // عدد العناصر في الصفحة الواحدة
     
     let data = readData();
@@ -791,6 +812,18 @@ app.get('/api/activation-codes', authenticateToken, (req, res) => {
         filteredCodes = data.activationCodes.filter(code => code.usedBy);
     } else if (filter === 'disabled') {
         filteredCodes = data.activationCodes.filter(code => code.isDisabled);
+    }
+    
+    // تصفية إضافية حسب الصف الدراسي
+    if (grade && grade !== '') {
+        const gradeId = parseInt(grade);
+        filteredCodes = filteredCodes.filter(code => code.gradeId === gradeId);
+    }
+    
+    // تصفية إضافية حسب الكورس
+    if (course && course !== '') {
+        const courseId = parseInt(course);
+        filteredCodes = filteredCodes.filter(code => code.courseIds && code.courseIds.includes(courseId));
     }
     
     // ترتيب الأكواد (الأحدث أولاً)
@@ -822,7 +855,7 @@ app.get('/api/activation-codes', authenticateToken, (req, res) => {
 app.get('/api/activation-codes/search', authenticateToken, (req, res) => {
     if (!req.user.isAdmin) return res.sendStatus(403);
     
-    const { term, filter = 'all' } = req.query;
+    const { term, filter = 'all', grade = '', course = '' } = req.query;
     if (!term) return res.status(400).json({ message: 'يرجى تحديد مصطلح البحث' });
     
     let data = readData();
@@ -843,6 +876,18 @@ app.get('/api/activation-codes/search', authenticateToken, (req, res) => {
         filteredCodes = data.activationCodes.filter(code => code.usedBy);
     } else if (filter === 'disabled') {
         filteredCodes = data.activationCodes.filter(code => code.isDisabled);
+    }
+    
+    // تصفية إضافية حسب الصف الدراسي
+    if (grade && grade !== '') {
+        const gradeId = parseInt(grade);
+        filteredCodes = filteredCodes.filter(code => code.gradeId === gradeId);
+    }
+    
+    // تصفية إضافية حسب الكورس
+    if (course && course !== '') {
+        const courseId = parseInt(course);
+        filteredCodes = filteredCodes.filter(code => code.courseIds && code.courseIds.includes(courseId));
     }
     
     // البحث عن المصطلح في الكود أو اسم المستخدم
@@ -1086,7 +1131,7 @@ app.get('/api/codes-export', authenticateToken, (req, res) => {
         return res.status(403).json({ message: 'غير مصرح لك بتصدير الأكواد' });
     }
     
-    const { filter = 'all' } = req.query;
+    const { filter = 'all', grade = '', course = '', includeCourses = false } = req.query;
     
     let data = readData();
     
@@ -1108,12 +1153,31 @@ app.get('/api/codes-export', authenticateToken, (req, res) => {
         filteredCodes = data.activationCodes.filter(code => code.isDisabled);
     }
     
+    // تصفية إضافية حسب الصف الدراسي
+    if (grade && grade !== '') {
+        const gradeId = parseInt(grade);
+        filteredCodes = filteredCodes.filter(code => code.gradeId === gradeId);
+    }
+    
+    // تصفية إضافية حسب الكورس
+    if (course && course !== '') {
+        const courseId = parseInt(course);
+        filteredCodes = filteredCodes.filter(code => code.courseIds && code.courseIds.includes(courseId));
+    }
+    
     if (filteredCodes.length === 0) {
         return res.status(200).send('لا توجد أكواد تطابق معايير التصفية المحددة');
     }
     
     // إعداد البيانات للتصدير بتنسيق CSV
-    let csvContent = 'كود التفعيل,عدد الكورسات,الصف الدراسي,تاريخ الإنشاء,الحالة,المستخدم,تاريخ الاستخدام\n';
+    let csvHeaders = 'كود التفعيل,عدد الكورسات,الصف الدراسي,تاريخ الإنشاء,الحالة,المستخدم,تاريخ الاستخدام';
+    
+    // إضافة عمود أسماء الكورسات عند الطلب
+    if (includeCourses === 'true') {
+        csvHeaders += ',أسماء الكورسات';
+    }
+    
+    let csvContent = csvHeaders + '\n';
     
     filteredCodes.forEach(code => {
         let status = code.isDisabled ? 'معطل' : (code.usedBy ? 'مستخدم' : 'نشط');
@@ -1130,7 +1194,20 @@ app.get('/api/codes-export', authenticateToken, (req, res) => {
             }
         }
         
-        csvContent += `${code.code},${courseCount},${gradeName},${new Date(code.creationDate).toLocaleDateString('ar-EG')},${status},${code.usedBy || '-'},${code.usageDate ? new Date(code.usageDate).toLocaleDateString('ar-EG') : '-'}\n`;
+        // إنشاء سطر CSV الأساسي
+        let csvLine = `${code.code},${courseCount},${gradeName},${new Date(code.creationDate).toLocaleDateString('ar-EG')},${status},${code.usedBy || '-'},${code.usageDate ? new Date(code.usageDate).toLocaleDateString('ar-EG') : '-'}`;
+        
+        // إضافة أسماء الكورسات إذا تم طلب ذلك
+        if (includeCourses === 'true' && code.courseIds && Array.isArray(code.courseIds)) {
+            const courseNames = code.courseIds.map(courseId => {
+                const course = data.courses.find(c => c.id === courseId);
+                return course ? course.title : '';
+            }).filter(Boolean).join(' | ');
+            
+            csvLine += `,${courseNames}`;
+        }
+        
+        csvContent += csvLine + '\n';
     });
     
     // تحديد اسم الملف بالإنجليزية
@@ -1138,6 +1215,10 @@ app.get('/api/codes-export', authenticateToken, (req, res) => {
     if (filter === 'active') fileName = 'active-codes';
     if (filter === 'used') fileName = 'used-codes';
     if (filter === 'disabled') fileName = 'disabled-codes';
+    
+    // إضافة معلومات الفلترة الإضافية إلى اسم الملف
+    if (grade && grade !== '') fileName += `-grade-${grade}`;
+    if (course && course !== '') fileName += `-course-${course}`;
     
     // إضافة التاريخ إلى اسم الملف
     const date = new Date().toISOString().split('T')[0];

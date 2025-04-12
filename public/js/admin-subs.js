@@ -25,6 +25,9 @@ let grades = [];
 let availableCourses = [];
 let selectedCourses = [];
 let selectAllActive = false;
+let currentGradeFilter = ''; // New: For filtering by grade
+let currentCourseFilter = ''; // New: For filtering by course
+let allCoursesList = []; // New: All courses across all grades
 
 // When the document is ready
 
@@ -32,7 +35,39 @@ let selectAllActive = false;
     loadStatistics();
     loadCodes();
     loadGrades();
+    loadAllCourses(); // New: Load all courses for filtering
     setupEventListeners();
+
+// Load all courses for filtering
+function loadAllCourses() {
+    fetch('/api/admin-all-courses', {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    })
+    .then(response => response.json())
+    .then(data => {
+        allCoursesList = data;
+        populateCoursesFilterDropdown();
+    })
+    .catch(error => {
+        console.error('Error loading all courses:', error);
+    });
+}
+
+// Populate courses filter dropdown
+function populateCoursesFilterDropdown() {
+    const courseFilter = document.getElementById('courseFilter');
+    courseFilter.innerHTML = '<option value="">جميع الكورسات</option>';
+    
+    if (allCoursesList && allCoursesList.length > 0) {
+        allCoursesList.forEach(course => {
+            const option = document.createElement('option');
+            option.value = course.id;
+            option.textContent = course.title;
+            courseFilter.appendChild(option);
+        });
+    }
+}
 
 // Load grades for dropdown
 function loadGrades() {
@@ -44,6 +79,7 @@ function loadGrades() {
     .then(data => {
         grades = data;
         populateGradesDropdown();
+        populateGradesFilterDropdown(); // New: Populate the grade filter dropdown
         if (typeof loadCodes === 'function') {
             loadCodes(codesPage);
         }
@@ -51,6 +87,21 @@ function loadGrades() {
     .catch(error => {
         console.error('Error loading grades:', error);
     });
+}
+
+// Populate grades filter dropdown
+function populateGradesFilterDropdown() {
+    const gradeFilter = document.getElementById('gradeFilter');
+    if (gradeFilter) {
+        gradeFilter.innerHTML = '<option value="">جميع الصفوف الدراسية</option>';
+        
+        grades.forEach(grade => {
+            const option = document.createElement('option');
+            option.value = grade.id;
+            option.textContent = grade.name;
+            gradeFilter.appendChild(option);
+        });
+    }
 }
 
 // Populate grades dropdown
@@ -194,7 +245,16 @@ function loadStatistics() {
 
 // Load activation codes
 function loadCodes(page = 1) {
-    fetch(`/api/activation-codes?page=${page}&filter=${currentFilter}`, {
+    // Build query parameters including new filters
+    let queryParams = `page=${page}&filter=${currentFilter}`;
+    if (currentGradeFilter) {
+        queryParams += `&grade=${currentGradeFilter}`;
+    }
+    if (currentCourseFilter) {
+        queryParams += `&course=${currentCourseFilter}`;
+    }
+    
+    fetch(`/api/activation-codes?${queryParams}`, {
         method: 'GET',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
     })
@@ -373,7 +433,16 @@ function searchCodes(searchTerm) {
         return;
     }
 
-    fetch(`/api/activation-codes/search?term=${encodeURIComponent(searchTerm)}&filter=${currentFilter}`, {
+    // Build query parameters including all filters
+    let queryParams = `term=${encodeURIComponent(searchTerm)}&filter=${currentFilter}`;
+    if (currentGradeFilter) {
+        queryParams += `&grade=${currentGradeFilter}`;
+    }
+    if (currentCourseFilter) {
+        queryParams += `&course=${currentCourseFilter}`;
+    }
+
+    fetch(`/api/activation-codes/search?${queryParams}`, {
         method: 'GET',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
     })
@@ -508,18 +577,35 @@ function generateCodes() {
 }
 
 // Export codes to Excel/CSV
-function exportCodes(filter) {
+function exportCodes(filter, isFiltered = false) {
     // إظهار مؤشر التحميل
     document.body.style.cursor = 'wait';
-    const exportBtn = document.querySelector(`#export${filter === 'all' ? 'All' : filter === 'active' ? 'Active' : filter === 'used' ? 'Used' : 'Disabled'}Codes`);
+    let exportBtn;
+    
+    if (isFiltered) {
+        exportBtn = document.querySelector('#exportFilteredCodes');
+    } else {
+        exportBtn = document.querySelector(`#export${filter === 'all' ? 'All' : filter === 'active' ? 'Active' : filter === 'used' ? 'Used' : 'Disabled'}Codes`);
+    }
     
     if (exportBtn) {
         exportBtn.disabled = true;
         exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التصدير...';
     }
     
+    // Build query parameters including all filters
+    let queryParams = `filter=${filter}`;
+    if (isFiltered) {
+        if (currentGradeFilter) {
+            queryParams += `&grade=${currentGradeFilter}`;
+        }
+        if (currentCourseFilter) {
+            queryParams += `&course=${currentCourseFilter}`;
+        }
+    }
+    
     // استخدام Fetch API للتحقق من الاستجابة
-    fetch(`/api/codes-export?filter=${filter}`, {
+    fetch(`/api/codes-export?${queryParams}&includeCourses=true`, {
         method: 'GET',
         headers: {
             'Authorization': `Bearer ${localStorage.getItem('token')}`
@@ -544,9 +630,14 @@ function exportCodes(filter) {
         // تحديد اسم الملف
         const date = new Date().toISOString().split('T')[0];
         let fileName = 'activation-codes';
-        if (filter === 'active') fileName = 'active-codes';
-        if (filter === 'used') fileName = 'used-codes';
-        if (filter === 'disabled') fileName = 'disabled-codes';
+        
+        if (isFiltered) {
+            fileName = 'filtered-codes';
+        } else {
+            if (filter === 'active') fileName = 'active-codes';
+            if (filter === 'used') fileName = 'used-codes';
+            if (filter === 'disabled') fileName = 'disabled-codes';
+        }
         
         a.download = `${fileName}-${date}.csv`;
         
@@ -558,28 +649,34 @@ function exportCodes(filter) {
         document.body.removeChild(a);
         
         // إعادة الزر إلى حالته الطبيعية
-        resetExportButton(exportBtn, filter);
+        resetExportButton(exportBtn, filter, isFiltered);
     })
     .catch(error => {
         console.error('Error exporting codes:', error);
         alert(error.message || 'حدث خطأ أثناء تصدير الأكواد.');
         
         // إعادة الزر إلى حالته الطبيعية
-        resetExportButton(exportBtn, filter);
+        resetExportButton(exportBtn, filter, isFiltered);
     });
 }
 
 // إعادة تعيين حالة زر التصدير
-function resetExportButton(button, filter) {
+function resetExportButton(button, filter, isFiltered = false) {
     document.body.style.cursor = 'default';
     if (button) {
         button.disabled = false;
         
         // إعادة النص الأصلي للزر
-        let btnText = 'تصدير جميع الأكواد';
-        if (filter === 'active') btnText = 'تصدير الأكواد النشطة';
-        if (filter === 'used') btnText = 'تصدير الأكواد المستخدمة';
-        if (filter === 'disabled') btnText = 'تصدير الأكواد المعطلة';
+        let btnText;
+        
+        if (isFiltered) {
+            btnText = 'تصدير النتائج المفلترة';
+        } else {
+            btnText = 'تصدير جميع الأكواد';
+            if (filter === 'active') btnText = 'تصدير الأكواد النشطة';
+            if (filter === 'used') btnText = 'تصدير الأكواد المستخدمة';
+            if (filter === 'disabled') btnText = 'تصدير الأكواد المعطلة';
+        }
         
         button.innerHTML = `<i class="fas fa-file-export me-1"></i> ${btnText}`;
     }
@@ -657,6 +754,30 @@ function setupEventListeners() {
         selectAllActive = false;
         updateToggleAllButtonText();
     });
+
+    // Grade filter change
+    const gradeFilter = document.getElementById('gradeFilter');
+    if (gradeFilter) {
+        gradeFilter.addEventListener('change', function() {
+            currentGradeFilter = this.value;
+            applyAdvancedFilters();
+        });
+    }
+    
+    // Course filter change
+    const courseFilter = document.getElementById('courseFilter');
+    if (courseFilter) {
+        courseFilter.addEventListener('change', function() {
+            currentCourseFilter = this.value;
+            applyAdvancedFilters();
+        });
+    }
+    
+    // Export filtered codes button
+    const exportFilteredBtn = document.getElementById('exportFilteredCodes');
+    if (exportFilteredBtn) {
+        exportFilteredBtn.addEventListener('click', () => exportCodes(currentFilter, true));
+    }
 }
 
 // Attach event listeners to code action buttons
@@ -835,5 +956,11 @@ function debounce(func, delay) {
         timeout = setTimeout(() => func.apply(context, args), delay);
     };
     }
+
+// Apply grade and course filters
+function applyAdvancedFilters() {
+    codesPage = 1; // Reset to first page when changing filters
+    loadCodes(codesPage);
+}
 
 });

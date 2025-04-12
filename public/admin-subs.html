@@ -164,6 +164,29 @@
                         <button class="btn btn-sm btn-outline-warning" data-filter="disabled">الأكواد المعطلة</button>
                     </div>
 
+                    <!-- فلترة الأكواد حسب الصف والكورس -->
+                    <div class="advanced-filters mb-3">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <select id="gradeFilter" class="form-select">
+                                    <option value="">جميع الصفوف الدراسية</option>
+                                    <!-- سيتم ملء هذه القائمة ديناميكيًا -->
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <select id="courseFilter" class="form-select">
+                                    <option value="">جميع الكورسات</option>
+                                    <!-- سيتم ملء هذه القائمة ديناميكيًا -->
+                                </select>
+                            </div>
+                            <div class="col-md-4 text-end">
+                                <button id="exportFilteredCodes" class="btn btn-outline-primary">
+                                    <i class="fas fa-file-export me-1"></i> تصدير النتائج المفلترة
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- جدول أكواد التفعيل -->
                     <div class="table-responsive">
                         <table class="table data-table" id="codesTable">
