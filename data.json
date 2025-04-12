@@ -251,7 +251,7 @@
       "videos": [],
       "activities": [],
       "exams": [],
-      "grade": "الصف الاول الاعدادي",
+      "grade": "الصف الثاني الاعدادي",
       "imageURL": "/uploads/1743517864506.webp",
       "addedDate": "2023-10-30T12:23:58.580Z",
       "price": 0
@@ -302,9 +302,9 @@
       "createdBy": 1738562296250,
       "isDisabled": false,
       "disabledBy": 1738562296250,
-      "disabledDate": "2025-04-12T15:17:37.523Z",
+      "disabledDate": "2025-04-12T16:56:34.163Z",
       "enabledBy": 1738562296250,
-      "enabledDate": "2025-04-12T15:17:38.900Z"
+      "enabledDate": "2025-04-12T16:56:39.097Z"
     },
     {
       "id": 1744468768919,
@@ -317,9 +317,70 @@
       "createdBy": 1738562296250,
       "isDisabled": false,
       "disabledBy": 1738562296250,
-      "disabledDate": "2025-04-12T15:16:44.643Z",
+      "disabledDate": "2025-04-12T17:12:54.833Z",
       "enabledBy": 1738562296250,
-      "enabledDate": "2025-04-12T15:16:46.769Z"
+      "enabledDate": "2025-04-12T17:13:05.859Z"
+    },
+    {
+      "id": 1744477908151,
+      "code": "2EQ3FL",
+      "gradeId": 1738789224871,
+      "courseIds": [
+        1743346705551,
+        1743320238580
+      ],
+      "creationDate": "2025-04-12T17:11:48.153Z",
+      "createdBy": 1738562296250
+    },
+    {
+      "id": 1744477936104,
+      "code": "G5JSAL",
+      "gradeId": 1738789210737,
+      "courseIds": [
+        1743346705551
+      ],
+      "creationDate": "2025-04-12T17:12:16.104Z",
+      "createdBy": 1738562296250
+    },
+    {
+      "id": 1744477936105,
+      "code": "3XS24A",
+      "gradeId": 1738789210737,
+      "courseIds": [
+        1743346705551
+      ],
+      "creationDate": "2025-04-12T17:12:16.104Z",
+      "createdBy": 1738562296250
+    },
+    {
+      "id": 1744477936106,
+      "code": "3G82CP",
+      "gradeId": 1738789210737,
+      "courseIds": [
+        1743346705551
+      ],
+      "creationDate": "2025-04-12T17:12:16.104Z",
+      "createdBy": 1738562296250
+    },
+    {
+      "id": 1744477936107,
+      "code": "AM8YMG",
+      "gradeId": 1738789210737,
+      "courseIds": [
+        1743346705551
+      ],
+      "creationDate": "2025-04-12T17:12:16.105Z",
+      "createdBy": 1738562296250
+    },
+    {
+      "id": 1744477936109,
+      "code": "AS3DVM",
+      "gradeId": 1738789210737,
+      "courseIds": [
+        1743346705551
+      ],
+      "creationDate": "2025-04-12T17:12:16.105Z",
+      "createdBy": 1738562296250
     }
   ]
 }

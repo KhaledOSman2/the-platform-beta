@@ -1113,11 +1113,24 @@ app.get('/api/codes-export', authenticateToken, (req, res) => {
     }
     
     // إعداد البيانات للتصدير بتنسيق CSV
-    let csvContent = 'كود التفعيل,تاريخ الإنشاء,الحالة,المستخدم,تاريخ الاستخدام\n';
+    let csvContent = 'كود التفعيل,عدد الكورسات,الصف الدراسي,تاريخ الإنشاء,الحالة,المستخدم,تاريخ الاستخدام\n';
     
     filteredCodes.forEach(code => {
         let status = code.isDisabled ? 'معطل' : (code.usedBy ? 'مستخدم' : 'نشط');
-        csvContent += `${code.code},${new Date(code.creationDate).toLocaleDateString('ar-EG')},${status},${code.usedBy || '-'},${code.usageDate ? new Date(code.usageDate).toLocaleDateString('ar-EG') : '-'}\n`;
+        
+        // الحصول على عدد الكورسات
+        const courseCount = code.courseIds ? code.courseIds.length : 0;
+        
+        // الحصول على اسم الصف
+        let gradeName = '-';
+        if (code.gradeId && data.grades) {
+            const grade = data.grades.find(g => g.id === code.gradeId);
+            if (grade) {
+                gradeName = grade.name;
+            }
+        }
+        
+        csvContent += `${code.code},${courseCount},${gradeName},${new Date(code.creationDate).toLocaleDateString('ar-EG')},${status},${code.usedBy || '-'},${code.usageDate ? new Date(code.usageDate).toLocaleDateString('ar-EG') : '-'}\n`;
     });
     
     // تحديد اسم الملف بالإنجليزية

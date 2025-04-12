@@ -44,6 +44,9 @@ function loadGrades() {
     .then(data => {
         grades = data;
         populateGradesDropdown();
+        if (typeof loadCodes === 'function') {
+            loadCodes(codesPage);
+        }
     })
     .catch(error => {
         console.error('Error loading grades:', error);
@@ -255,9 +258,23 @@ function displayCodes() {
         let statusClass = isActive ? 'success' : (isDisabled ? 'warning' : 'secondary');
         let statusText = isActive ? 'نشط' : (isDisabled ? 'معطل' : 'مستخدم');
 
+        // حساب عدد الكورسات
+        const courseCount = code.courseIds ? code.courseIds.length : 0;
+
+        // الحصول على اسم الصف
+        let gradeName = '-';
+        if (code.gradeId && grades && Array.isArray(grades)) {
+            const grade = grades.find(g => g.id === code.gradeId);
+            if (grade) {
+                gradeName = grade.name;
+            }
+        }
+
         row.innerHTML = `
             <td>${startIndex + index + 1}</td>
             <td>${code.code}</td>
+            <td>${courseCount} كورس</td>
+            <td>${gradeName}</td>
             <td>${formatDate(code.creationDate)}</td>
             <td><span class="badge bg-${statusClass}">${statusText}</span></td>
             <td>${code.usedBy || '-'}</td>
