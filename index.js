@@ -1079,8 +1079,13 @@ app.delete('/api/activation-codes/:id', authenticateToken, (req, res) => {
     });
 });
 
-// تصدير الأكواد (نظام بسيط وآمن)
-app.get('/api/codes-export', (req, res) => {
+// تصدير الأكواد
+app.get('/api/codes-export', authenticateToken, (req, res) => {
+    // التحقق من صلاحيات المستخدم
+    if (!req.user || !req.user.isAdmin) {
+        return res.status(403).json({ message: 'غير مصرح لك بتصدير الأكواد' });
+    }
+    
     const { filter = 'all' } = req.query;
     
     let data = readData();

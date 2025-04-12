@@ -494,38 +494,78 @@ function generateCodes() {
 function exportCodes(filter) {
     // إظهار مؤشر التحميل
     document.body.style.cursor = 'wait';
-    const exportBtn = document.querySelector(`button[onclick="exportCodes('${filter}')"]`);
+    const exportBtn = document.querySelector(`#export${filter === 'all' ? 'All' : filter === 'active' ? 'Active' : filter === 'used' ? 'Used' : 'Disabled'}Codes`);
+    
     if (exportBtn) {
         exportBtn.disabled = true;
         exportBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري التصدير...';
     }
     
-    // استخدام iframe مخفي للتنزيل
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = `/api/codes-export?filter=${filter}`;
-    document.body.appendChild(iframe);
-    
-    // إعادة الزر إلى حالته الطبيعية بعد ثانيتين
-    setTimeout(() => {
-        document.body.style.cursor = 'default';
-        if (exportBtn) {
-            exportBtn.disabled = false;
-            
-            // إعادة النص الأصلي للزر
-            let btnText = 'تصدير جميع الأكواد';
-            if (filter === 'active') btnText = 'تصدير الأكواد النشطة';
-            if (filter === 'used') btnText = 'تصدير الأكواد المستخدمة';
-            if (filter === 'disabled') btnText = 'تصدير الأكواد المعطلة';
-            
-            exportBtn.innerHTML = `<i class="fas fa-file-export me-1"></i> ${btnText}`;
+    // استخدام Fetch API للتحقق من الاستجابة
+    fetch(`/api/codes-export?filter=${filter}`, {
+        method: 'GET',
+        headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`
         }
+    })
+    .then(response => {
+        if (response.status === 403) {
+            throw new Error('غير مصرح لك بتصدير الأكواد. يرجى تسجيل الدخول كمشرف.');
+        }
+        if (!response.ok) {
+            throw new Error(`Status: ${response.status} - ${response.statusText}`);
+        }
+        return response.blob();
+    })
+    .then(blob => {
+        // إنشاء عنصر <a> مؤقت لتنزيل الملف
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = url;
         
-        // إزالة الإطار بعد التنزيل
-        setTimeout(() => {
-            document.body.removeChild(iframe);
-        }, 1000);
-    }, 2000);
+        // تحديد اسم الملف
+        const date = new Date().toISOString().split('T')[0];
+        let fileName = 'activation-codes';
+        if (filter === 'active') fileName = 'active-codes';
+        if (filter === 'used') fileName = 'used-codes';
+        if (filter === 'disabled') fileName = 'disabled-codes';
+        
+        a.download = `${fileName}-${date}.csv`;
+        
+        document.body.appendChild(a);
+        a.click();
+        
+        // تنظيف العناصر المؤقتة
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        
+        // إعادة الزر إلى حالته الطبيعية
+        resetExportButton(exportBtn, filter);
+    })
+    .catch(error => {
+        console.error('Error exporting codes:', error);
+        alert(error.message || 'حدث خطأ أثناء تصدير الأكواد.');
+        
+        // إعادة الزر إلى حالته الطبيعية
+        resetExportButton(exportBtn, filter);
+    });
+}
+
+// إعادة تعيين حالة زر التصدير
+function resetExportButton(button, filter) {
+    document.body.style.cursor = 'default';
+    if (button) {
+        button.disabled = false;
+        
+        // إعادة النص الأصلي للزر
+        let btnText = 'تصدير جميع الأكواد';
+        if (filter === 'active') btnText = 'تصدير الأكواد النشطة';
+        if (filter === 'used') btnText = 'تصدير الأكواد المستخدمة';
+        if (filter === 'disabled') btnText = 'تصدير الأكواد المعطلة';
+        
+        button.innerHTML = `<i class="fas fa-file-export me-1"></i> ${btnText}`;
+    }
 }
 
 // Helper function to format dates
