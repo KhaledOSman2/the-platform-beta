@@ -57,6 +57,45 @@ document.addEventListener('DOMContentLoaded', async function () {
                 console.error('Error fetching grades:', err);
             }
         }
+        
+        // عرض الإشعارات العامة على الصفحة الرئيسية
+        if (currentPath.endsWith('index.html') || currentPath === '/' || currentPath === '') {
+            try {
+                const response = await fetch('/api/notifications');
+                let notifications = await response.json();
+                
+                // تصفية الإشعارات للعرض فقط الإشعارات العامة
+                notifications = notifications.filter(notification => 
+                    !notification.grade || notification.grade === 'عام'
+                );
+                
+                if (notifications.length > 0) {
+                    // الإشعار الأحدث هو الأخير في المصفوفة
+                    const latestNotification = notifications[notifications.length - 1];
+                    
+                    // تحديث الإشعار الموجود بالبيانات الجديدة
+                    const titleElement = document.querySelector('.notification-title');
+                    const messageElement = document.querySelector('.notification-message');
+                    
+                    if (titleElement && messageElement) {
+                        titleElement.textContent = latestNotification.title;
+                        messageElement.textContent = latestNotification.content;
+                        console.log('تم تحديث الإشعار بنجاح');
+                    } else {
+                        console.log('لم يتم العثور على عناصر الإشعار في الصفحة');
+                    }
+                } else {
+                    // إخفاء قسم الإشعارات إذا لم تكن هناك إشعارات عامة
+                    const notificationsSection = document.querySelector('.notifications-section');
+                    if (notificationsSection) {
+                        notificationsSection.style.display = 'none';
+                        console.log('تم إخفاء قسم الإشعارات لعدم وجود إشعارات عامة');
+                    }
+                }
+            } catch (error) {
+                console.error('حدث خطأ أثناء جلب الإشعارات:', error);
+            }
+        }
     }
 });
 
